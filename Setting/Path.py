@@ -1,4 +1,4 @@
-path = "//192.168.0.123/4. 화재안전팀/00. 공정 및 시간관리/Data"
+path = "Data"
 path_user = f"{path}/User.db"
 path_business = f"{path}/Business.db"
 path_main = f"{path}/Main.db"

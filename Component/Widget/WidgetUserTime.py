@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QGroupBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtCore import Qt
+from Connector.ConnMain import ConnMain
 from Component.Table.TableTimeBusiness import TableTimeBusiness
 from Component.Table.TableTimeTime import TableTimeTime
 from Component.Table.TableTimeHeader import TableTimeHeader
@@ -121,7 +122,8 @@ class WidgetUserTime(QWidget):
         filePath = dig.getSaveFileName(caption='엑셀로 내보내기', directory='', filter='*.xlsx')[0]
         if filePath != '':
             with ExcelWriter(filePath) as writer:
-                _, df = self.connMain.ColumnAndDfTimeWhole(self.year, self.userName)
+                connMain = ConnMain()
+                _, df = connMain.ColumnAndDfTimeWhole(self.year, self.userName)
                 del df['성명']
                 df.to_excel(writer, sheet_name=f'{self.userName}-시간정보', index=False)
                 writer.close()
