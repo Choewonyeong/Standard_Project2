@@ -1,3 +1,13 @@
+SplashScreenLoading = """
+QSplashScreen{
+    background: #ffffff;
+}
+"""
+
+
+
+
+
 PushButton_Excel = """
 QPushButton{
     color: white;

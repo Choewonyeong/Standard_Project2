@@ -1,23 +1,22 @@
 from PyQt5.QtWidgets import QApplication
-from Component.Loading import Loading
+from component.main.Loading import Loading
 from sys import argv
 
 
-if __name__ == "__main__":
+def run():
     app = QApplication(argv)
     loading = Loading()
     loading.show()
-    from Component.Login import Login
-    from Component.Windows import Windows
-    from Connector.ConnUser import ConnUser
-
-    connUser = ConnUser()
-    userNames = connUser.ReturnUserNames()
+    from component.main.Login import Login
     login = Login(app)
     login.show()
     loading.finish(login)
     app.exec_()
-    if login.userName in userNames:
-        windows = Windows(login.userName, login.author)
-        windows.show()
-        app.exec_()
+
+
+if __name__ == "__main__":
+    run()
+
+
+
+
