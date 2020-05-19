@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from connector.connUser import connUser
+from component.dialog.DialogMassage import DialogMassage
 import setting
 
 
@@ -24,9 +25,9 @@ class Login(QDialog):
         self.connUser = connUser()
 
     def __variables__(self):
-        self.userId = ''
+        self.account = ''
         self.author = ''
-        self.userIds = self.connUser.returnAccounts()
+        self.accounts = self.connUser.returnAccounts()
 
     def __component__(self):
         self.__label__()
@@ -54,42 +55,45 @@ class Login(QDialog):
         self.ldtPassword.setAlignment(Qt.AlignCenter)
 
     def __pushButton__(self):
+        def btnCloseClick():
+            self.app.quit()
+
+        def btnLoginClick():
+            account = self.ldtAccount.text()
+            password = self.ldtPassword.text()
+            if account == '':
+                DialogMassage('계정을 입력하세요.')
+            elif account not in self.accounts:
+                DialogMassage('등록되지 않은 계정입니다.')
+            elif password == '':
+                DialogMassage('비밀번호를 입력하세요.')
+            elif password != self.connUser.returnPassword(account):
+                DialogMassage('비밀번호가 일치하지 않습니다.')
+                self.ldtPassword.setText('')
+            else:
+                from component.main.Windows import Windows
+                author = self.connUser.returnAuthor(account)
+                window = Windows(account, author)
+                window.show()
+                self.close()
+                self.app.exec_()
+
+        def btnSignupClick():
+            from component.main.Signup import Signup
+            signup = Signup()
+            signup.exec_()
+
         self.btnClose = QPushButton('닫기')
         self.btnClose.setCursor(Qt.PointingHandCursor)
-        self.btnClose.clicked.connect(self.btnCloseClick)
+        self.btnClose.clicked.connect(btnCloseClick)
         self.btnLogin = QPushButton('로그인')
         self.btnLogin.setCursor(Qt.PointingHandCursor)
         self.btnLogin.setShortcut('return')
         self.btnLogin.setDefault(True)
-        self.btnLogin.clicked.connect(self.btnLoginClick)
+        self.btnLogin.clicked.connect(btnLoginClick)
         self.btnSignup = QPushButton('회원가입')
         self.btnSignup.setCursor(Qt.PointingHandCursor)
-        self.btnSignup.clicked.connect(self.btnSignupClick)
-
-    def btnCloseClick(self):
-        self.app.quit()
-
-    def btnLoginClick(self):
-        account = self.ldtAccount.text()
-        password = self.ldtPassword.text()
-        if account == '':
-            print('Error 1')     # 계정 입력
-        elif password == '': 
-            print('Error 2')     # 비밀번호 입력
-        elif password != self.connUser.returnPassword(account):
-            print('Error 3')     # 비밀번호 불일치
-        else:
-            from component.main.Windows import Windows
-            author = self.connUser.returnAuthor(account)
-            window = Windows(account, author)
-            window.show()
-            self.close()
-            self.app.exec_()
-
-    def btnSignupClick(self):
-        from component.main.Signup import Signup
-        signup = Signup()
-        signup.exec_()
+        self.btnSignup.clicked.connect(btnSignupClick)
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
