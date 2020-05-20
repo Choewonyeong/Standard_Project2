@@ -73,9 +73,6 @@ class connUser:
         except Exception as e:
             print('insertNewUser', e)
 
-    def columnsSignup(self):
-        return ['계정', '성명', '수정한날짜']
-
     def dataFrameSignup(self, column=False):
         try:
             conn = self.__conn__()
@@ -240,3 +237,13 @@ class connUser:
             conn.close()
         except Exception as e:
             print('updateAuthor', e)
+
+    def updateUser(self, header, data, account):
+        try:
+            conn = self.__conn__()
+            query = f"update User set `{header}`='{data}' Where `계정`='{account}';"
+            print(query)
+            conn.execute(query)
+            conn.close()
+        except Exception as e:
+            print('updateUser', e)

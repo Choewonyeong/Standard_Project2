@@ -1,22 +1,17 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
 from pandas import ExcelWriter
-from connector.connUser import connUser
-from component.table.TableAdminUser import TableAdminUser
+from component.dialog.DialogNewBusiness import DialogNewBusiness
+from component.table.TableAdminBusiness import TableAdminBusiness
 
 
-class DialogAdminUser(QDialog):
+class DialogAdminBusiness(QDialog):
     def __init__(self):
         QDialog.__init__(self)
         self.__setting__()
-        self.__connector__()
         self.__component__()
 
     def __setting__(self):
-        self.setWindowFlag(Qt.FramelessWindowHint)
-
-    def __connector__(self):
-        self.connUser = connUser()
+        pass
 
     def __component__(self):
         self.__pushButton__()
@@ -30,34 +25,33 @@ class DialogAdminUser(QDialog):
         self.btnClose.clicked.connect(btnCloseClick)
         self.btnClose.setFixedWidth(80)
 
-        def btnSaveClick():
-            for obj in self.tbl.objects:
-                if obj.editLog:
-                    self.connUser.updateUser(obj.header, obj.data, obj.ID)
-        self.btnSave = QPushButton('저장')
-        self.btnSave.clicked.connect(btnSaveClick)
-        self.btnSave.setFixedWidth(80)
+        def btnInsertClick():
+            dig = DialogNewBusiness()
+            dig.exec_()
+        self.btnInput = QPushButton('신규 입력')
+        self.btnInput.clicked.connect(btnInsertClick)
+        self.btnInput.setFixedWidth(80)
 
-        def btnExcelClick():
+        def btnSaveClick():
             dig = QFileDialog(self)
             filePath = dig.getSaveFileName(caption="엑셀로 저장", directory='', filter='*.xlsx')[0]
             if filePath != '':
                 with ExcelWriter(filePath) as writer:
                     dataFrame = self.tbl.dataFrame
-                    dataFrame.to_excel(writer, sheet_name="화재안전팀 부서원 현황(관리자)", index=False)
+                    dataFrame.to_excel(writer, sheet_name="화재안전팀 사업 현황", index=False)
                 writer.close()
-        self.btnExcel = QPushButton('엑셀로 저장')
-        self.btnExcel.clicked.connect(btnExcelClick)
-        self.btnExcel.setFixedWidth(80)
+        self.btnSave = QPushButton('엑셀로 저장')
+        self.btnSave.clicked.connect(btnSaveClick)
+        self.btnSave.setFixedWidth(80)
 
     def __table__(self):
-        self.tbl = TableAdminUser()
+        self.tbl = TableAdminBusiness()
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
         layoutBtn.addWidget(self.btnClose)
+        layoutBtn.addWidget(self.btnInput)
         layoutBtn.addWidget(self.btnSave)
-        layoutBtn.addWidget(self.btnExcel)
         layoutBtn.addWidget(QLabel(), 10)
         layout = QVBoxLayout()
         layout.addLayout(layoutBtn)

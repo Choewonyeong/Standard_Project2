@@ -34,15 +34,15 @@ class DialogInquiryUser(QDialog):
             filePath = dig.getSaveFileName(caption="엑셀로 저장", directory='', filter='*.xlsx')[0]
             if filePath != '':
                 with ExcelWriter(filePath) as writer:
-                    dataFrame = self.tblUser.dataFrame
-                    dataFrame.to_excel(writer, sheet_name="화재안전팀 부서원 현황", index=False)
+                    dataFrame = self.tbl.dataFrame
+                    dataFrame.to_excel(writer, sheet_name="화재안전팀 부서원 현황(일반)", index=False)
                 writer.close()
         self.btnSave = QPushButton('엑셀로 저장')
         self.btnSave.clicked.connect(btnSaveClick)
         self.btnSave.setFixedWidth(80)
 
     def __table__(self):
-        self.tblUser = TableInquiryUser()
+        self.tbl = TableInquiryUser()
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
@@ -51,5 +51,5 @@ class DialogInquiryUser(QDialog):
         layoutBtn.addWidget(QLabel(), 10)
         layout = QVBoxLayout()
         layout.addLayout(layoutBtn)
-        layout.addWidget(self.tblUser)
+        layout.addWidget(self.tbl)
         self.setLayout(layout)

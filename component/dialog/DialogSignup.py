@@ -99,6 +99,9 @@ class Signup(QDialog):
     def __pushButton__(self):
         def btnCloseClick():
             self.close()
+        self.btnClose = QPushButton('닫기')
+        self.btnClose.setCursor(Qt.PointingHandCursor)
+        self.btnClose.clicked.connect(btnCloseClick)
 
         def btnSignupClick():
             userInfo = [self.ldtAccount.text(),
@@ -131,10 +134,6 @@ class Signup(QDialog):
                 self.connUser.insertNewUser(userInfo)
                 admins = self.connUser.returnAdmins()
                 DialogMassage(f"회원가입 신청이 완료되었습니다.\n관리자에게 승인을 요청하세요.\n관리자 : {', '.join(admins)}")
-
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.setCursor(Qt.PointingHandCursor)
-        self.btnClose.clicked.connect(btnCloseClick)
         self.btnSignup = QPushButton('신청')
         self.btnSignup.setDefault(True)
         self.btnSignup.setCursor(Qt.PointingHandCursor)

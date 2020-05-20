@@ -1,7 +1,7 @@
 dirDatabase = "data"
 databaseUser = f"{dirDatabase}/User.db"
 databaseBusiness = f"{dirDatabase}/Business.db"
-databaseMain = f"{dirDatabase}/Main.db"
+# databaseMain = f"{dirDatabase}/Main.db"
 
 dirImg = "design/img"
 imgUser = f"{dirImg}/user.png"

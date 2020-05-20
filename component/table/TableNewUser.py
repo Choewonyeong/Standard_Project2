@@ -17,9 +17,7 @@ class TableNewUser(QTableWidget):
 
     def __variables__(self):
         self.columns = self.connUser.dataFrameSignup(column=True)+['', '']
-        print(self.columns)
         self.dataFrame = self.connUser.dataFrameSignup()
-        print(self.dataFrame)
 
     def __setting__(self):
         self.setRowCount(0)

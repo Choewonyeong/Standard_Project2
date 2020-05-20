@@ -6,11 +6,14 @@ from component.table.TableAdminUser import TableAdminUser
 from component.dialog.DialogInquiryUser import DialogInquiryUser
 from component.table.TableInquiryUser import TableInquiryUser
 from component.main.Windows import Windows
+from component.dialog.DialogNewBusiness import DialogNewBusiness
+from component.dialog.DialogAdminUser import DialogAdminUser
+from component.dialog.DialogAdminBusiness import DialogAdminBusiness
 from sys import argv
 
 
 if __name__ == "__main__":
     app = QApplication(argv)
-    dig = DialogInquiryUser()
+    dig = DialogAdminBusiness()
     dig.show()
     app.exec_()

@@ -79,7 +79,7 @@ class Login(QDialog):
                 self.app.exec_()
 
         def btnSignupClick():
-            from component.main.Signup import Signup
+            from component.dialog.DialogSignup import Signup
             signup = Signup()
             signup.exec_()
 
