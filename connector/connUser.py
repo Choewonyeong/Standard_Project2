@@ -202,46 +202,11 @@ class connUser:
             print('returnName', e)
             return ''
 
-    def updatePosition(self, account, position):
-        try:
-            conn = self.__conn__()
-            query = f"update User set `직급`='{position}' Where `계정`='{account}';"
-            conn.execute(query)
-            conn.close()
-        except Exception as e:
-            print('updatePosition', e)
-
-    def updateDegree(self, account, degree):
-        try:
-            conn = self.__conn__()
-            query = f"update User set `최종학력`='{degree}' Where `계정`='{account}';"
-            conn.execute(query)
-            conn.close()
-        except Exception as e:
-            print('updatePosition', e)
-
-    def updateStatus(self, account, status):
-        try:
-            conn = self.__conn__()
-            query = f"update User set `재직상태`='{status}' Where `계정`='{account}';"
-            conn.execute(query)
-            conn.close()
-        except Exception as e:
-            print('updateStatus', e)
-
-    def updateAuthor(self, account, author):
-        try:
-            conn = self.__conn__()
-            query = f"update User set `접근권한`='{author}' Where `계정`='{account}';"
-            conn.execute(query)
-            conn.close()
-        except Exception as e:
-            print('updateAuthor', e)
-
     def updateUser(self, header, data, account):
         try:
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             conn = self.__conn__()
-            query = f"update User set `{header}`='{data}' Where `계정`='{account}';"
+            query = f"update User set `{header}`='{data}', `수정한날짜`='{now}' Where `계정`='{account}';"
             print(query)
             conn.execute(query)
             conn.close()

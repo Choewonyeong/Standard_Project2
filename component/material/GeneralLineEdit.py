@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 
 
 class GeneralLineEdit(QLineEdit):
-    def __init__(self, text, option=None):
+    def __init__(self, text='', option=None):
         QLineEdit.__init__(self)
         self.init = text
         self.setText(text)
@@ -20,7 +20,7 @@ class GeneralLineEdit(QLineEdit):
                 self.editLog = True
         self.data = None
         self.editLog = False
-        self.textCHanged.connect(getData)
+        self.textChanged.connect(getData)
 
     def __setOption__(self):
         if self.option == 'disable':

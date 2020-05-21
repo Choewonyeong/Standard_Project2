@@ -13,7 +13,7 @@ class TableAdminUser(QTableWidget):
         self.__variables__()
         self.__setting__()
         self.__setData__()
-        self.__setWidth__()
+        # self.__setWidth__()
 
     def __connector__(self):
         self.connUser = connUser()
@@ -22,6 +22,7 @@ class TableAdminUser(QTableWidget):
         self.editLog = []
         self.objects = []
         self.columns = self.connUser.dataFrameUser(column=True)+['']
+        print(self.columns)
         self.dataFrame = self.connUser.dataFrameUser()
         del self.dataFrame[self.columns[14]]
         self.columns.pop(14)
@@ -40,10 +41,8 @@ class TableAdminUser(QTableWidget):
                 item = QTableWidgetItem(data)
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row, col, item)
-                if col in [1, 7, 8, 9, 10, 11]:
+                if col in [1, 2, 7, 8, 9, 10, 11]:
                     TableLineEdit(row, col, data, self)
-                elif col == 2:
-                    TableLineEdit(row, col, data, self, option="password")
                 elif col == 3:
                     TableComboBox(row, col, ['', '이사', '부장', '차장', '과장', '대리', '사원'], data, self)
                 elif col == 4:
@@ -59,9 +58,11 @@ class TableAdminUser(QTableWidget):
             col = len(self.columns)-1
             TablePushButton(row, col, '삭제', self, option='User')
         self.resizeColumnsToContents()
-
-    def __setWidth__(self):
-        width = 10
-        for col, header in enumerate(self.columns):
-            width += self.columnWidth(col)
-        self.setFixedWidth(width)
+        self.setColumnWidth(1, 50)
+        self.setColumnWidth(2, 100)
+        self.setColumnWidth(4, 80)
+        self.setColumnWidth(5, 100)
+        self.setColumnWidth(6, 120)
+        self.setColumnWidth(7, 120)
+        self.setColumnWidth(8, 80)
+        self.setColumnWidth(9, 80)

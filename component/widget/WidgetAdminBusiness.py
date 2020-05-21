@@ -1,27 +1,20 @@
-from PyQt5.QtGui import QPalette
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from pandas import ExcelWriter
 from connector.connBusiness import connBusiness
-from component.material.GeneralLabel import GeneralLabel
 from component.dialog.DialogNewBusiness import DialogNewBusiness
 from component.table.TableAdminBusiness import TableAdminBusiness
 
 
-class DialogAdminBusiness(QDialog):
+class WidgetAdminBusiness(QWidget):
     def __init__(self):
-        QDialog.__init__(self)
+        QWidget.__init__(self)
         self.__setting__()
         self.__connector__()
         self.__component__()
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
-        background = QPalette()
-        background.setBrush(10, QBrush(QColor(255, 255, 255)))
-        self.setPalette(background)
 
     def __connector__(self):
         self.connBusiness = connBusiness()
@@ -29,7 +22,6 @@ class DialogAdminBusiness(QDialog):
     def __component__(self):
         self.__pushButton__()
         self.__table__()
-        self.__label__()
         self.__layout__()
 
     def __pushButton__(self):
@@ -40,11 +32,8 @@ class DialogAdminBusiness(QDialog):
         self.btnClose.setFixedWidth(80)
 
         def btnInsertClick():
-            try:
-                dig = DialogNewBusiness()
-                dig.exec_()
-            except Exception as e:
-                print(e)
+            dig = DialogNewBusiness()
+            dig.exec_()
         self.btnInput = QPushButton('신규 입력')
         self.btnInput.clicked.connect(btnInsertClick)
         self.btnInput.setFixedWidth(80)
@@ -72,11 +61,6 @@ class DialogAdminBusiness(QDialog):
     def __table__(self):
         self.tbl = TableAdminBusiness()
 
-    def __label__(self):
-        cnt = len(self.tbl.dataFrame)-2
-        cnt = 0 if cnt < 0 else cnt
-        self.lblCount = GeneralLabel(f"총 사업 수 : {cnt} 건")
-
     def __layout__(self):
         layoutBtn = QHBoxLayout()
         layoutBtn.addWidget(self.btnClose)
@@ -86,6 +70,5 @@ class DialogAdminBusiness(QDialog):
         layoutBtn.addWidget(QLabel(), 10)
         layout = QVBoxLayout()
         layout.addLayout(layoutBtn)
-        layout.addWidget(self.lblCount)
         layout.addWidget(self.tbl)
         self.setLayout(layout)

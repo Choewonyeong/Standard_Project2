@@ -1,3 +1,6 @@
+from PyQt5.QtGui import QPalette
+from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QPushButton
@@ -20,6 +23,9 @@ class DialogMassage(QDialog):
         # self.setStyleSheet()
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setFixedWidth(350)
+        background = QPalette()
+        background.setBrush(10, QBrush(QColor(255, 255, 255)))
+        self.setPalette(background)
 
     def __component__(self):
         self.__label__()

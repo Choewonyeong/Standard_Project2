@@ -1,15 +1,22 @@
+from datetime import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connBusiness import connBusiness
 from component.dialog.DialogMassage import DialogMassage
 from component.material.GeneralLineEdit import GeneralLineEdit
+from component.material.GeneralLabel import GeneralLabel
+from component.material.GeneralTextEdit import GeneralTextEdit
+from component.material.GeneralComboBox import GeneralComboBox
 
 
 class DialogNewBusiness(QDialog):
-    def __init__(self):
+    def __init__(self, parent):
         QDialog.__init__(self)
         self.__setting__()
+        self.__connector__()
+        self.__variables__()
         self.__component__()
+        self.parent = parent
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -18,8 +25,7 @@ class DialogNewBusiness(QDialog):
         self.connBusiness = connBusiness()
 
     def __variables__(self):
-        numbers = self.connBusiness.returnNumbers()
-        self.number = 0 if not numbers else max(numbers)
+        pass
 
     def __component__(self):
         self.__label__()
@@ -28,21 +34,20 @@ class DialogNewBusiness(QDialog):
         self.__layout__()
 
     def __label__(self):
-        lblTitle = QLabel('사업명')
-        lblCode = QLabel('사업코드')
-        lblForm = QLabel('사업형태')
-        lblOrder = QLabel('발주처')
-        lblSummary = QLabel('사업요약')
-        lblStart = QLabel('시작일')
-        lblEnd = QLabel('종료일')
-        lblMonth = QLabel('개월수')
-        lblMax = QLabel('보존기간')
-        lblMaster = QLabel('사업책임자')
-        lblPL = QLabel('PL')
-        lblAdmin = QLabel('기술행정')
-        lblPrice = QLabel('사업비')
-        lblStatus = QLabel('진행상태')
-        lblEditDate = QLabel('수정한날짜')
+        lblTitle = GeneralLabel('사업명')
+        lblCode = GeneralLabel('사업코드')
+        lblForm = GeneralLabel('사업형태')
+        lblOrder = GeneralLabel('발주처')
+        lblSummary = GeneralLabel('사업요약')
+        lblStart = GeneralLabel('시작일')
+        lblEnd = GeneralLabel('종료일')
+        lblMonth = GeneralLabel('개월수')
+        lblMax = GeneralLabel('보존기간')
+        lblMaster = GeneralLabel('사업책임자')
+        lblPL = GeneralLabel('PL')
+        lblAdmin = GeneralLabel('기술행정')
+        lblPrice = GeneralLabel('사업비')
+        lblStatus = GeneralLabel('진행상태')
         self.objectLabel = [lblTitle,
                             lblCode,
                             lblForm,
@@ -56,32 +61,54 @@ class DialogNewBusiness(QDialog):
                             lblPL,
                             lblAdmin,
                             lblPrice,
-                            lblStatus,
-                            lblEditDate]
+                            lblStatus]
         for lbl in self.objectLabel:
             lbl.setFixedWidth(80)
 
     def __inputWidgets__(self):
-        ldtTitle = QLineEdit()
-        ldtCode = QLineEdit()
-        cbxForm = QComboBox()
-        cbxForm.addItems(['기술', '연구', '국책', '일반', '기타'])
-        ldtOrder = QLineEdit()
-        tedSummary = QTextEdit()
+        ldtTitle = GeneralLineEdit()
+        ldtCode = GeneralLineEdit()
+        cbxForm = GeneralComboBox(['기술', '연구', '국책', '일반', '기타'], '기술')
+        ldtOrder = GeneralLineEdit()
+        tedSummary = GeneralTextEdit()
         tedSummary.setFixedHeight(80)
-        ldtStart = QLineEdit()
-        ldtEnd = QLineEdit()
-        ldtMonth = QLineEdit()
-        ldtMax = QLineEdit()
-        ldtMaster = QLineEdit()
+        ldtStart = GeneralLineEdit(option='dateFormat')
+
+        def ldtStartEdit(text):
+            start = text
+            end = ldtEnd.text()
+            try:
+                start = datetime.strptime(start, '%Y-%m-%d')
+                end = datetime.strptime(end, '%Y-%m-%d')
+                yearCnt = (end.year - start.year)*12
+                monthCnt = end.month - start.month
+                totalCnt = yearCnt + monthCnt
+                self.objectInput[7].setText(str(totalCnt))
+            except:
+                pass
+        ldtStart.textEdited.connect(ldtStartEdit)
+
+        def ldtEndEdit(text):
+            start = ldtStart.text()
+            end = text
+            try:
+                start = datetime.strptime(start, '%Y-%m-%d')
+                end = datetime.strptime(end, '%Y-%m-%d')
+                yearCnt = (end.year - start.year)*12
+                monthCnt = end.month - start.month
+                totalCnt = yearCnt + monthCnt
+                self.objectInput[7].setText(str(totalCnt))
+            except:
+                pass
+        ldtEnd = GeneralLineEdit(option='dateFormat')
+        ldtEnd.textEdited.connect(ldtEndEdit)
+        ldtMonth = GeneralLineEdit(option='disable')
+        ldtMax = GeneralLineEdit(option='dateFormat')
+        ldtMaster = GeneralLineEdit()
         ldtPL = QLineEdit()
         ldtAdmin = QLineEdit()
-        ldtPrice = QLineEdit()
-        cbxStatus = QComboBox()
-        cbxStatus.addItems(['수주', '진행', '중단', '준공', 'A/S'])
-        cbxStatus.setCurrentText('진행')
-        ldtEditDate = QLineEdit()
-        ldtEditDate.setEnabled(False)
+        ldtPrice = GeneralLineEdit(option='moneyFormat')
+        cbxStatus = GeneralComboBox(['수주', '진행', '중단', '준공', 'A/S'], '진행')
         self.objectInput = [ldtTitle,
                             ldtCode,
                             cbxForm,
@@ -95,8 +122,7 @@ class DialogNewBusiness(QDialog):
                             ldtPL,
                             ldtAdmin,
                             ldtPrice,
-                            cbxStatus,
-                            ldtEditDate]
+                            cbxStatus]
 
     def __pushButton__(self):
         def btnCloseClick():
@@ -118,7 +144,13 @@ class DialogNewBusiness(QDialog):
                 DialogMassage('사업명을 입력하세요.')
             elif businessInfo[1] == '':
                 DialogMassage('사업코드를 입력하세요.')
-            print(businessInfo)
+            else:
+                self.connBusiness.insertBusiness(businessInfo)
+                try:
+                    self.parent.window.refresh()
+                except Exception as e:
+                    print(e)
+
         self.btnInsert = QPushButton('입력')
         self.btnInsert.setCursor(Qt.PointingHandCursor)
         self.btnInsert.clicked.connect(btnInsertClick)
@@ -129,7 +161,6 @@ class DialogNewBusiness(QDialog):
         layoutBtn.addWidget(self.btnClose)
         layoutBtn.addWidget(self.btnInsert)
         layout = QVBoxLayout()
-        # 내일 여기부터
         for lbl, widget in zip(self.objectLabel, self.objectInput):
             layoutObjects = QHBoxLayout()
             layoutObjects.addWidget(lbl)

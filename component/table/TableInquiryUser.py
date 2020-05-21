@@ -38,8 +38,3 @@ class TableInquiryUser(QTableWidget):
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row, col, item)
         self.resizeColumnsToContents()
-
-        width = 10
-        for col, header in enumerate(self.columns):
-            width += self.columnWidth(col)
-        self.setFixedWidth(width)

@@ -10,9 +10,10 @@ from component.dialog.DialogNewBusiness import DialogNewBusiness
 from component.table.TableAdminBusiness import TableAdminBusiness
 
 
-class DialogAdminBusiness(QDialog):
-    def __init__(self):
-        QDialog.__init__(self)
+class GroupBoxAdminBusiness(QGroupBox):
+    def __init__(self, window):
+        QGroupBox.__init__(self)
+        self.window = window
         self.__setting__()
         self.__connector__()
         self.__component__()
@@ -33,18 +34,9 @@ class DialogAdminBusiness(QDialog):
         self.__layout__()
 
     def __pushButton__(self):
-        def btnCloseClick():
-            self.close()
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.clicked.connect(btnCloseClick)
-        self.btnClose.setFixedWidth(80)
-
         def btnInsertClick():
-            try:
-                dig = DialogNewBusiness()
-                dig.exec_()
-            except Exception as e:
-                print(e)
+            dig = DialogNewBusiness(self)
+            dig.exec_()
         self.btnInput = QPushButton('신규 입력')
         self.btnInput.clicked.connect(btnInsertClick)
         self.btnInput.setFixedWidth(80)
@@ -79,7 +71,6 @@ class DialogAdminBusiness(QDialog):
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
-        layoutBtn.addWidget(self.btnClose)
         layoutBtn.addWidget(self.btnInput)
         layoutBtn.addWidget(self.btnSave)
         layoutBtn.addWidget(self.btnExcel)

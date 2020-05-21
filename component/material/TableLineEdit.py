@@ -1,10 +1,17 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 
+style = """
+QLineEdit{
+    border: 0px solid white;
+}
+"""
+
 
 class TableLineEdit(QLineEdit):
     def __init__(self, row, col, text, table, option=None):
         QLineEdit.__init__(self)
+        # self.setStyleSheet(style)
         self.row = row
         self.col = col
         self.init = text

@@ -61,8 +61,3 @@ class TableNewUser(QTableWidget):
             self.__btnAccept__(row)
             self.__btnReject__(row)
         self.resizeColumnsToContents()
-
-        width = 10
-        for col, header in enumerate(self.columns):
-            width += self.columnWidth(col)
-        self.setFixedWidth(width)

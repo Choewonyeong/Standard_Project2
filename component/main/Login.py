@@ -71,12 +71,15 @@ class Login(QDialog):
                 DialogMassage('비밀번호가 일치하지 않습니다.')
                 self.ldtPassword.setText('')
             else:
-                from component.main.Windows import Windows
-                author = self.connUser.returnAuthor(account)
-                window = Windows(account, author)
-                window.show()
-                self.close()
-                self.app.exec_()
+                try:
+                    from component.main.Windows import Windows
+                    author = self.connUser.returnAuthor(account)
+                    window = Windows(account, author, self.app)
+                    window.show()
+                    self.close()
+                    self.app.exec_()
+                except Exception as e:
+                    print(e)
 
         def btnSignupClick():
             from component.dialog.DialogSignup import Signup

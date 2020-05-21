@@ -13,7 +13,6 @@ class TablePushButton(QPushButton):
         self.option = option
         self.setText(text)
         self.setFixedWidth(80)
-        self.clicked.connect(self.btnClick)
         self.__setting__()
 
     def __setting__(self):
@@ -23,13 +22,21 @@ class TablePushButton(QPushButton):
             self.connUser = connUser()
         if self.option == 'Business':
             self.connBusiness = connBusiness()
+        if self.option == 'Disable':
+            self.setEnabled(False)
         self.table.setCellWidget(self.row, self.col, self)
 
     def btnClick(self):
-        msgBox = DialogMassage("계정 정보를 지우시겠습니까?", True)
-        if self.option == 'User' and msgBox.value:
-            self.connUser.deleteUser(self.ID)
-            self.table.removeRow(self.row)
-        if self.optioin == 'Business' and msgBox.value:
-            self.connBusiness.deleteBusiness(self.ID)
-            self.table.removeRow(self.row)
+        try:
+            if self.option == 'User':
+                msgBox = DialogMassage("계정 정보를 지우시겠습니까?", True)
+                if msgBox.value:
+                    self.connUser.deleteUser(self.ID)
+                    self.table.removeRow(self.row)
+            if self.option == 'Business':
+                msgBox = DialogMassage("사업 정보를 지우시겠습니까?", True)
+                if msgBox.value:
+                    self.connBusiness.deleteBusiness(self.ID)
+                    self.table.removeRow(self.row)
+        except Exception as e:
+            print(e)

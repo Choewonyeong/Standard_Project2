@@ -43,8 +43,9 @@ class connBusiness:
 
     def updateBusiness(self, header, data, number):
         try:
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             conn = self.__conn__()
-            query = f"update Business set `{header}`='{data} Where `번호`='{number}';"
+            query = f"update Business set `{header}`='{data}, `수정한날짜`='{now}' Where `번호`='{number}';"
             conn.execute(query)
             conn.close()
         except Exception as e:
@@ -58,3 +59,27 @@ class connBusiness:
             conn.close()
         except Exception as e:
             print('deleteBusiness', e)
+
+    def insertBusiness(self, businessInfo):
+        try:
+            number = 0 if not self.returnNumbers()[0:-1] else max(self.returnNumbers()[0:-1])+1
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            businessInfo = [str(number)]+businessInfo
+            businessInfo.append(now)
+            conn = self.__conn__()
+            query = f"""insert into Business Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+            conn.execute(query, businessInfo)
+            conn.close()
+        except Exception as e:
+            print('insertBusiness', e)
+
+    def returnFilterItem(self, header):
+        try:
+            conn = self.__conn__()
+            query = f"select `{header}` from Business;"
+            run = conn.execute(query)
+            items = [item[0] for item in run.fetchall()]
+            conn.close()
+            return items
+        except Exception as e:
+            print('returnFilterItem', e)
