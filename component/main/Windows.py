@@ -46,7 +46,7 @@ class Windows(QWidget):
         self.itemMain = [self.name, '조회', '관리', '로그아웃']
         self.itemUser = ['개인정보', '시간관리']
         self.itemInquiry = ['부서원 정보 조회', '연도별시간집계', '사업별시간집계']
-        self.itemAdmin = ['회원가입 신청 목록', '부서원 정보 관리', '사업 정보 관리', '데이터베이스 관리']
+        self.itemAdmin = ['회원가입 신청 현황', '부서원 정보 관리', '사업 정보 관리', '데이터베이스 관리']
         self.valueUser = False
         self.valueInquiry = False
         self.valueAdmin = False
@@ -132,10 +132,11 @@ class Windows(QWidget):
         def lstAdminItemClick(item):
             menu = item.text()
             if menu == self.itemAdmin[0] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxNewUser(), menu)
-                self.currentTab.append(menu)
-                self.tab.setCurrentIndex(self.currentIdx)
-                self.currentIdx += 1
+                DialogNewUser()
+                # self.tab.addTab(GroupBoxNewUser(), menu)
+                # self.currentTab.append(menu)
+                # self.tab.setCurrentIndex(self.currentIdx)
+                # self.currentIdx += 1
             elif menu == self.itemAdmin[1] and menu not in self.currentTab:
                 self.tab.addTab(GroupBoxAdminUser(), menu)
                 self.currentTab.append(menu)

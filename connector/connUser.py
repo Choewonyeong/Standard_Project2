@@ -203,12 +203,37 @@ class connUser:
             return ''
 
     def updateUser(self, header, data, account):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             conn = self.__conn__()
             query = f"update User set `{header}`='{data}', `수정한날짜`='{now}' Where `계정`='{account}';"
-            print(query)
             conn.execute(query)
             conn.close()
+            return now
         except Exception as e:
             print('updateUser', e)
+            return now
+
+    def returnAdminPassword(self):
+        try:
+            conn = self.__conn__()
+            query = f"select `비밀번호` from User Where `접근권한`='관리자';"
+            run = conn.execute(query)
+            passwords = [password[0] for password in run.fetchall()]
+            conn.close()
+            return passwords
+        except Exception as e:
+            print('returnAdminPassword', e)
+            return ['Not Exist Admin Password']
+
+    def updatePassword(self, account, password):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            conn = self.__conn__()
+            query = f"update User set `비밀번호`='{password}', `수정한날짜`='{now}' Where `계정`='{account}';"
+            conn.execute(query)
+            conn.close()
+            return now
+        except Exception as e:
+            print('updatePassword', e)
+            return now

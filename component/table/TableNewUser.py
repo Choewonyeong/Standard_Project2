@@ -1,23 +1,15 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-from connector.connUser import connUser
 from component.dialog.DialogMassage import DialogMassage
 
 
 class TableNewUser(QTableWidget):
-    def __init__(self):
+    def __init__(self, columns, dataFrame):
         QTableWidget.__init__(self)
-        self.__connUser__()
-        self.__variables__()
+        self.columns = columns
+        self.dataFrame = dataFrame
         self.__setting__()
         self.__setData__()
-
-    def __connUser__(self):
-        self.connUser = connUser()
-
-    def __variables__(self):
-        self.columns = self.connUser.dataFrameSignup(column=True)+['', '']
-        self.dataFrame = self.connUser.dataFrameSignup()
 
     def __setting__(self):
         self.setRowCount(0)

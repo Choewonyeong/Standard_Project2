@@ -27,7 +27,7 @@ class GroupBoxAdminUser(QGroupBox):
         def btnSaveClick():
             for obj in self.tbl.objects:
                 if obj.editLog:
-                    self.connUser.updateUser(obj.header, obj.data, obj.ID)
+                    self.tbl.UpdateEditDate(obj.row, self.connUser.updateUser(obj.header, obj.data, obj.ID))
         self.btnSave = QPushButton('저장')
         self.btnSave.clicked.connect(btnSaveClick)
         self.btnSave.setFixedWidth(80)

@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connBusiness import connBusiness
@@ -60,7 +59,7 @@ class TableAdminBusiness(QTableWidget):
                 TablePushButton(row, col, '삭제', self, option='Business')
         self.resizeColumnsToContents()
         self.hideColumn(0)
-        self.hideRow(1)
+        self.hideRow(0)
         self.hideRow(len(self.dataFrame)-1)
         self.setColumnWidth(2, 70)
         self.setColumnWidth(8, 50)

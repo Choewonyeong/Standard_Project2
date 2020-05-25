@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QPushButton
 from component.dialog.DialogMassage import DialogMassage
 from connector.connUser import connUser
 from connector.connBusiness import connBusiness
+from component.dialog.DialogAdmin import DialogAdmin
 
 
 class TablePushButton(QPushButton):
@@ -38,5 +39,8 @@ class TablePushButton(QPushButton):
                 if msgBox.value:
                     self.connBusiness.deleteBusiness(self.ID)
                     self.table.removeRow(self.row)
+            if self.option == 'Password':
+                account = self.table.item(self.row, 0).text()
+                DialogAdmin(account, self.row, self.table)
         except Exception as e:
             print(e)
