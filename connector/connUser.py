@@ -237,3 +237,28 @@ class connUser:
         except Exception as e:
             print('updatePassword', e)
             return now
+
+    def returnSource(self):
+        try:
+            conn = self.__conn__()
+            query = "select `계정`, `성명` from User;"
+            run = conn.execute(query)
+            sources = [list(source) for source in run.fetchall()]
+            conn.close()
+            return sources
+        except Exception as e:
+            print('returnSource', e)
+            return []
+
+    def returnNames(self):
+        try:
+            conn = self.__conn__()
+            query = "select `성명` from User;"
+            run = conn.execute(query)
+            names = [name[0] for name in run.fetchall()]
+            conn.close()
+            return names
+        except Exception as e:
+            print('returnNames', e)
+            return []
+

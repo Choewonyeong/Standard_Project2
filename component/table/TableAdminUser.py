@@ -3,7 +3,8 @@ from PyQt5.QtCore import Qt
 from connector.connUser import connUser
 from component.material.TableLineEdit import TableLineEdit
 from component.material.TableComboBox import TableComboBox
-from component.material.TablePushButton import TablePushButton
+from component.material.BtnTableUserDelete import BtnTableUserDelete
+from component.material.BtnTableUserPassword import BtnTableUserPassword
 
 
 class TableAdminUser(QTableWidget):
@@ -20,7 +21,7 @@ class TableAdminUser(QTableWidget):
     def __variables__(self):
         self.editLog = []
         self.objects = []
-        self.columns = self.connUser.dataFrameUser(column=True)+['비밀번호', '']
+        self.columns = self.connUser.dataFrameUser(column=True)+['비밀번호', '설정']
         self.dataFrame = self.connUser.dataFrameUser()
         del self.dataFrame[self.columns[14]]
         del self.dataFrame[self.columns[2]]
@@ -36,7 +37,7 @@ class TableAdminUser(QTableWidget):
     def __setData__(self):
         for row, lst in enumerate(self.dataFrame.values):
             self.insertRow(row)
-            self.setRowHeight(50, row)
+            # self.setRowHeight(row, 50)
             for col, data in enumerate(lst):
                 item = QTableWidgetItem(data)
                 item.setFlags(Qt.ItemIsEditable)
@@ -56,9 +57,9 @@ class TableAdminUser(QTableWidget):
                 elif col == 12:
                     TableComboBox(row, col, ['사용자', '관리자'], data, self)
             col = len(self.columns)-2
-            TablePushButton(row, col, '확인', self, option='Password')
+            BtnTableUserPassword(row, col, '확인', self)
             col = col+1
-            TablePushButton(row, col, '삭제', self, option='User')
+            BtnTableUserDelete(row, col, '삭제', self)
         self.resizeColumnsToContents()
         self.setColumnWidth(1, 60)
         self.setColumnWidth(3, 80)

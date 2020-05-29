@@ -22,6 +22,7 @@ class DialogMassage(QDialog):
     def __setting__(self):
         # self.setStyleSheet()
         self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setFixedWidth(350)
         background = QPalette()
         background.setBrush(10, QBrush(QColor(255, 255, 255)))

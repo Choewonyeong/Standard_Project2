@@ -9,11 +9,12 @@ from component.main.Windows import Windows
 from component.dialog.DialogNewBusiness import DialogNewBusiness
 from component.dialog.DialogAdminUser import DialogAdminUser
 from component.dialog.DialogAdminBusiness import DialogAdminBusiness
+from component.table.TableTotalPerYear import TableTotalPerYear
 from sys import argv
 
 
 if __name__ == "__main__":
     app = QApplication(argv)
-    dig = DialogAdminBusiness()
+    dig = TableTotalPerYear()
     dig.show()
     app.exec_()

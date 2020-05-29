@@ -8,17 +8,23 @@ from component.material.WindowSubList import WindowSubList
 from component.dialog.DialogUserSelf import DialogUserSelf
 from component.dialog.DialogMassage import DialogMassage
 from component.dialog.DialogNewUser import DialogNewUser
-from component.dialog.DialogInquiryUser import DialogInquiryUser
-from component.dialog.DialogAdminUser import DialogAdminUser
-from component.dialog.DialogAdminBusiness import DialogAdminBusiness
+from component.groupBox.GroupBoxUserTime import GroupBoxUserTime
 from component.groupBox.GroupBoxAdminBusiness import GroupBoxAdminBusiness
 from component.groupBox.GroupBoxAdminUser import GroupBoxAdminUser
 from component.groupBox.GroupBoxInquiryUser import GroupBoxInquiryUser
 from component.groupBox.GroupBoxNewUser import GroupBoxNewUser
+from component.groupBox.GroupBoxDatabase import GroupBoxDatabase
+from component.groupBox.GroupBoxTotalPerYear import GroupBoxTotalPerYear
+from component.groupBox.GroupBoxTotalPerUser import GroupBoxTotalPerUser
+from datetime import date
 import setting
 
 
 class Windows(QWidget):
+    TIME_YEAR = str(date.today().year)
+    DB_YEAR = str(date.today().year)
+    TOTAL_YEAR = str(date.today().year)
+
     def __init__(self, account, author, app):
         QWidget.__init__(self)
         self.account = account
@@ -105,10 +111,15 @@ class Windows(QWidget):
                 dig.exec_()
                 pass
             elif menu == self.itemUser[1]:
-                pass
+                try:
+                    self.tab.addTab(GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
+                    self.currentTab.append(menu)
+                    self.tab.setCurrentIndex(self.currentIdx)
+                    self.currentIdx += 1
+                except Exception as e:
+                    print(e)
             else:
                 self.tab.setCurrentIndex(self.currentTab.index(menu))
-
         self.lstUser = WindowSubList(self.itemUser)
         self.lstUser.itemClicked.connect(lstUserItemClick)
 
@@ -120,12 +131,20 @@ class Windows(QWidget):
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
             elif menu == self.itemInquiry[1]:
-                pass
+                self.tab.addTab(GroupBoxTotalPerYear(), menu)
+                self.currentTab.append(menu)
+                self.tab.setCurrentIndex(self.currentIdx)
+                self.currentIdx += 1
             elif menu == self.itemInquiry[2]:
-                pass
+                try:
+                    self.tab.addTab(GroupBoxTotalPerUser(self), menu)
+                    self.currentTab.append(menu)
+                    self.tab.setCurrentIndex(self.currentIdx)
+                    self.currentIdx += 1
+                except Exception as e:
+                    print(e)
             else:
                 self.tab.setCurrentIndex(self.currentTab.index(menu))
-
         self.lstInquiry = WindowSubList(self.itemInquiry)
         self.lstInquiry.itemClicked.connect(lstInquiryItemClick)
 
@@ -133,22 +152,21 @@ class Windows(QWidget):
             menu = item.text()
             if menu == self.itemAdmin[0] and menu not in self.currentTab:
                 DialogNewUser()
-                # self.tab.addTab(GroupBoxNewUser(), menu)
-                # self.currentTab.append(menu)
-                # self.tab.setCurrentIndex(self.currentIdx)
-                # self.currentIdx += 1
             elif menu == self.itemAdmin[1] and menu not in self.currentTab:
                 self.tab.addTab(GroupBoxAdminUser(), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
             elif menu == self.itemAdmin[2] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxAdminBusiness(self), menu)
+                self.tab.addTab(GroupBoxAdminBusiness(), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
             elif menu == self.itemAdmin[3] and menu not in self.currentTab:
-                pass
+                self.tab.addTab(GroupBoxDatabase(self), menu)
+                self.currentTab.append(menu)
+                self.tab.setCurrentIndex(self.currentIdx)
+                self.currentIdx += 1
             else:
                 self.tab.setCurrentIndex(self.currentTab.index(menu))
 
@@ -163,18 +181,21 @@ class Windows(QWidget):
             self.currentIdx -= 1
             if self.currentIdx < 0:
                 self.currentIdx = 0
+            if menu == self.itemAdmin[3]:
+                self.DB_YEAR = str(date.today().year)
         self.tab = QTabWidget()
         self.tab.setTabsClosable(True)
         self.tab.tabCloseRequested.connect(tabCloseRequest)
 
         def tabBarClick(idx):
+            print(self.DB_YEAR)
             try:
                 menu = self.currentTab[idx]
                 self.tab.removeTab(idx)
                 if menu == self.itemUser[0]:
                     pass
                 elif menu == self.itemUser[1]:
-                    pass
+                    self.tab.insertTab(idx, GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
                 elif menu == self.itemInquiry[0]:
                     self.tab.insertTab(idx, GroupBoxInquiryUser(), menu)
                 elif menu == self.itemInquiry[1]:
@@ -186,9 +207,9 @@ class Windows(QWidget):
                 elif menu == self.itemAdmin[1]:
                     self.tab.insertTab(idx, GroupBoxAdminUser(), menu)
                 elif menu == self.itemAdmin[2]:
-                    self.tab.insertTab(idx, GroupBoxAdminBusiness(self), menu)
+                    self.tab.insertTab(idx, GroupBoxAdminBusiness(), menu)
                 elif menu == self.itemAdmin[3]:
-                    pass
+                    self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
             except Exception as e:
                 print(e)
         self.tab.tabBarClicked.connect(tabBarClick)
@@ -210,7 +231,7 @@ class Windows(QWidget):
             if menu == self.itemUser[0]:
                 pass
             elif menu == self.itemUser[1]:
-                pass
+                self.tab.insertTab(idx, GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
             elif menu == self.itemInquiry[0]:
                 self.tab.insertTab(idx, GroupBoxInquiryUser(), menu)
             elif menu == self.itemInquiry[1]:
@@ -222,8 +243,22 @@ class Windows(QWidget):
             elif menu == self.itemAdmin[1]:
                 self.tab.insertTab(idx, GroupBoxAdminUser(), menu)
             elif menu == self.itemAdmin[2]:
-                self.tab.insertTab(idx, GroupBoxAdminBusiness(self), menu)
+                self.tab.insertTab(idx, GroupBoxAdminBusiness(), menu)
             elif menu == self.itemAdmin[3]:
-                pass
+                self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
         except Exception as e:
             print(e)
+
+    def refreshAdminDB(self):
+        menu = self.itemAdmin[3]
+        idx = self.currentTab.index(menu)
+        self.tab.removeTab(idx)
+        self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
+        self.tab.setCurrentIndex(idx)
+
+    def refreshTotalPerUser(self):
+        menu = self.itemInquiry[2]
+        idx = self.currentTab.index(menu)
+        self.tab.removeTab(idx)
+        self.tab.insertTab(idx, GroupBoxTotalPerUser(self), menu)
+        self.tab.setCurrentIndex(idx)

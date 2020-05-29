@@ -45,7 +45,7 @@ class connBusiness:
         try:
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             conn = self.__conn__()
-            query = f"update Business set `{header}`='{data}, `수정한날짜`='{now}' Where `번호`='{number}';"
+            query = f"update Business set `{header}`='{data}', `수정한날짜`='{now}' Where `번호`='{number}';"
             conn.execute(query)
             conn.close()
         except Exception as e:
@@ -83,3 +83,27 @@ class connBusiness:
             return items
         except Exception as e:
             print('returnFilterItem', e)
+
+    def returnSource(self):
+        try:
+            conn = self.__conn__()
+            query = "select `번호`, `사업명`, `사업코드` from Business;"
+            run = conn.execute(query)
+            sources = [list(source) for source in run.fetchall()]
+            conn.close()
+            return sources
+        except Exception as e:
+            print('returnSource', e)
+            return []
+
+    def returnBusinesses(self):
+        try:
+            conn = self.__conn__()
+            query = "select `사업명` from Business;"
+            run = conn.execute(query)
+            listBusiness = [business[0] for business in run.fetchall()]
+            conn.close()
+            return listBusiness
+        except Exception as e:
+            print('returnBusinesses', e)
+            return []

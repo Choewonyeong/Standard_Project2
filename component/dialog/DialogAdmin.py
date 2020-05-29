@@ -4,6 +4,7 @@ from connector.connUser import connUser
 from component.material.GeneralLineEdit import GeneralLineEdit
 from component.material.GeneralLabel import GeneralLabel
 from component.dialog.DialogPassword import DialogPassword
+from component.dialog.DialogMassage import DialogMassage
 
 
 class DialogAdmin(QDialog):
@@ -42,6 +43,11 @@ class DialogAdmin(QDialog):
         self.ldtPassword.setEchoMode(QLineEdit.Password)
 
     def __pushButton__(self):
+        def btnCloseClick():
+            self.close()
+        self.btnClose = QPushButton('닫기')
+        self.btnClose.clicked.connect(btnCloseClick)
+
         def btnConfirmClick():
             password = self.ldtPassword.text()
             if password in self.adminPasswords:
@@ -49,12 +55,18 @@ class DialogAdmin(QDialog):
                 userPassword = self.connUser.returnPassword(self.account)
                 self.close()
                 DialogPassword(userName, self.account, userPassword, self.row, self.table)
+            else:
+                DialogMassage('비밀번호가 맞지 않습니다.')
         self.btnConfirm = QPushButton('확인')
         self.btnConfirm.clicked.connect(btnConfirmClick)
+        self.btnConfirm.setShortcut('return')
 
     def __layout__(self):
-        layoutPassword = QVBoxLayout()
-        layoutPassword.addWidget(self.lblPassword)
-        layoutPassword.addWidget(self.ldtPassword)
-        layoutPassword.addWidget(self.btnConfirm)
-        self.setLayout(layoutPassword)
+        layoutBtn = QHBoxLayout()
+        layoutBtn.addWidget(self.btnClose)
+        layoutBtn.addWidget(self.btnConfirm)
+        layout = QVBoxLayout()
+        layout.addWidget(self.lblPassword)
+        layout.addWidget(self.ldtPassword)
+        layout.addLayout(layoutBtn)
+        self.setLayout(layout)

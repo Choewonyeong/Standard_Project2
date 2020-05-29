@@ -4,25 +4,23 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from pandas import ExcelWriter
+
 from connector.connBusiness import connBusiness
 from component.material.GeneralLabel import GeneralLabel
 from component.dialog.DialogNewBusiness import DialogNewBusiness
 from component.table.TableAdminBusiness import TableAdminBusiness
+from component.dialog.DialogMassage import DialogMassage
 
 
 class GroupBoxAdminBusiness(QGroupBox):
-    def __init__(self, window):
+    def __init__(self):
         QGroupBox.__init__(self)
-        self.window = window
         self.__setting__()
         self.__connector__()
         self.__component__()
 
     def __setting__(self):
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        background = QPalette()
-        background.setBrush(10, QBrush(QColor(255, 255, 255)))
-        self.setPalette(background)
+        pass
 
     def __connector__(self):
         self.connBusiness = connBusiness()
@@ -43,20 +41,26 @@ class GroupBoxAdminBusiness(QGroupBox):
 
         def btnSaveClick():
             for obj in self.tbl.objects:
+                cnt = 0
                 if obj.editLog:
                     self.connBusiness.updateBusiness(obj.header, obj.data, obj.ID)
+                    obj.init = obj.data
+                    obj.editLog = False
+                    cnt += 1
+                if cnt:
+                    DialogMassage('저장되었습니다.')
         self.btnSave = QPushButton('저장')
         self.btnSave.clicked.connect(btnSaveClick)
         self.btnSave.setFixedWidth(80)
 
+        # 엑셀로 저장 후 종료됨 -> 왜?
         def btnExcelClick():
             dig = QFileDialog(self)
             filePath = dig.getSaveFileName(caption="엑셀로 저장", directory='', filter='*.xlsx')[0]
             if filePath != '':
-                with ExcelWriter(filePath) as writer:
-                    dataFrame = self.tbl.dataFrame
-                    dataFrame.to_excel(writer, sheet_name="화재안전팀 사업 현황", index=False)
-                writer.close()
+                dataFrame = self.tbl.dataFrame
+                dataFrame.to_excel(filePath, sheet_name="화재안전팀 사업 현황", index=False)
+                DialogMassage('엑셀로 내보내기가 완료되었습니다.')
         self.btnExcel = QPushButton('엑셀로 저장')
         self.btnExcel.clicked.connect(btnExcelClick)
         self.btnExcel.setFixedWidth(80)
