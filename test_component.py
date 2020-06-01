@@ -1,14 +1,10 @@
 from PyQt5.QtWidgets import QApplication
-from component.dialog.DialogNewUser import DialogNewUser
 from component.dialog.DialogUserSelf import DialogUserSelf
 from component.table.TableNewUser import TableNewUser
 from component.table.TableAdminUser import TableAdminUser
-from component.dialog.DialogInquiryUser import DialogInquiryUser
 from component.table.TableInquiryUser import TableInquiryUser
 from component.main.Windows import Windows
 from component.dialog.DialogNewBusiness import DialogNewBusiness
-from component.dialog.DialogAdminUser import DialogAdminUser
-from component.dialog.DialogAdminBusiness import DialogAdminBusiness
 from component.table.TableTotalPerYear import TableTotalPerYear
 from sys import argv
 

@@ -23,12 +23,6 @@ class DialogInquiryUser(QDialog):
         self.__layout__()
 
     def __pushButton__(self):
-        def btnCloseClick():
-            self.close()
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.clicked.connect(btnCloseClick)
-        self.btnClose.setFixedWidth(80)
-
         def btnSaveClick():
             dig = QFileDialog(self)
             filePath = dig.getSaveFileName(caption="엑셀로 저장", directory='', filter='*.xlsx')[0]
@@ -46,7 +40,6 @@ class DialogInquiryUser(QDialog):
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
-        layoutBtn.addWidget(self.btnClose)
         layoutBtn.addWidget(self.btnSave)
         layoutBtn.addWidget(QLabel(), 10)
         layout = QVBoxLayout()

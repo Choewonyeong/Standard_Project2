@@ -76,7 +76,7 @@ class connUser:
     def dataFrameSignup(self, column=False):
         try:
             conn = self.__conn__()
-            query = "select `계정`, `성명`, `수정한날짜` from User Where `가입승인여부`='대기' or `가입승인여부`='거절';"
+            query = "select `계정`, `성명`, `수정한날짜` from User Where not `가입승인여부`='승인';"
             run = conn.execute(query)
             columns = [column[0] for column in run.description]
             if column:
@@ -93,7 +93,7 @@ class connUser:
     def dataFrameUser(self, column=False):
         try:
             conn = self.__conn__()
-            query = "select * from User Where `가입승인여부` = '승인';"
+            query = "select * from User Where `가입승인여부` = '승인' and not `계정`='master';"
             run = conn.execute(query)
             columns = [column[0] for column in run.description]
             if column:
@@ -238,10 +238,10 @@ class connUser:
             print('updatePassword', e)
             return now
 
-    def returnSource(self):
+    def returnSources(self):
         try:
             conn = self.__conn__()
-            query = "select `계정`, `성명` from User;"
+            query = "select `계정`, `성명` from User where not `계정`='master';"
             run = conn.execute(query)
             sources = [list(source) for source in run.fetchall()]
             conn.close()
@@ -250,10 +250,22 @@ class connUser:
             print('returnSource', e)
             return []
 
+    def returnSource(self, account):
+        try:
+            conn = self.__conn__()
+            query = f"select `계정`, `성명` from User where `계정`='{account}';"
+            run = conn.execute(query)
+            source = list(run.fetchall()[0])
+            conn.close()
+            return source
+        except Exception as e:
+            print('returnSource', e)
+            return []
+
     def returnNames(self):
         try:
             conn = self.__conn__()
-            query = "select `성명` from User;"
+            query = "select `성명` from User where not `계정`='master';"
             run = conn.execute(query)
             names = [name[0] for name in run.fetchall()]
             conn.close()

@@ -6,14 +6,12 @@ from connector.connBusiness import connBusiness
 from connector.connUser import connUser
 
 CONN_BUSINESS = connBusiness()
-listNumbers = CONN_BUSINESS.returnNumbers()
-listBusiness = CONN_BUSINESS.returnBusinesses()
 CONN_USER = connUser()
-listNames = CONN_USER.returnNames()
-listAccounts = CONN_USER.returnAccounts()
 
 
 def returnTotalPerYear(column=False):
+    listNumbers = CONN_BUSINESS.returnNumbers()
+    listBusiness = CONN_BUSINESS.returnBusinesses()
     listYears = listdir(databaseMain)
     columns = ['사업명']+[f"{year.replace('.db', '')}년" for year in listYears]+['합계']
     if column:
@@ -49,32 +47,48 @@ def returnTotalPerYear(column=False):
 
 
 def returnTotalPerUser(year, column=False):
+    listNumbers = CONN_BUSINESS.returnNumbers()
+    listBusiness = CONN_BUSINESS.returnBusinesses()
+    listNames = CONN_USER.returnNames()
+    listAccounts = CONN_USER.returnAccounts()
+    listAccounts.pop(0)
     businessListPerYear = connTotal.returnBusinesses(year)
     dateColumns = connTotal.returnColumns(year)[8:]
     listMonths = [f"0{month}/" if month < 10 else f"{month}/" for month in range(1, 13)]
     columns = ['사업명'] + [f"{month.replace('/', '월')}" for month in listMonths] + ['합계']
+    # columns = []
+    # for month in range(1, 13):
+    #     if month % 3 != 0 and month < 10:
+    #         columns.append(f"0{month}월")
+    #     elif month %3 != 0 and month >= 10:
+    #         columns.append(f"{month}월")
+    #     elif month % 3 == 0 and month < 10:
+    #         columns.append(f"0{month}월")
+    #         columns.append(f"{month//3}분기")
+    #     elif month % 3 == 0 and month >= 10:
+    #         columns.append(f"{month}월")
+    #         columns.append(f"{month//3}분기")
+    # columns.append('합계')
     if column:
         return columns
-
     else:
         monthColumns = [[] for x in range(1, 13)]
         for column in dateColumns:
             for idx in range(0, 12):
                 if listMonths[idx] in column:
                     monthColumns[idx].append(column)
-
         resultDict = {}
         for name, account in zip(listNames, listAccounts):
             totalPerUser = []
             for number, business in zip(listNumbers, listBusiness):
                 totalPerBusiness = []
                 for monthColumn in monthColumns:
-                    if business in businessListPerYear:
+                    if business not in businessListPerYear:
+                        value = 0.0
+                    else:
                         sumQuery = f"SUM(`{'`), SUM(`'.join(monthColumn)}`)"
                         query = f"Select {sumQuery} from Main Where `번호`='{number}' and `계정`='{account}' and `적용상태_사업`='적용' and `적용상태_부서원`='적용';"
                         value = sum(connTotal.runQuery_return(year, query))
-                    else:
-                        value = 0.0
                     totalPerBusiness.append(value)
                 totalPerBusiness.append(sum(totalPerBusiness))
                 totalPerUser.append(totalPerBusiness)
@@ -92,14 +106,13 @@ def returnTotalPerUser(year, column=False):
 
         totalWhole = [[0.0 for x in range(0, 14)] for x in range(len(listBusiness) + 1)]
         totalDataFrame = DataFrame(data=totalWhole, columns=columns)
-
-        listBusinessNames = listBusiness+['합계']
+        businessListPerYear += ['합계']
+        listBusiness += ['합계']
         for key in resultDict.keys():
             totalDataFrame += resultDict[key]
-            resultDict[key]['사업명'] = listBusinessNames
-        totalDataFrame['사업명'] = listBusinessNames
+            resultDict[key]['사업명'] = listBusiness
+        totalDataFrame['사업명'] = listBusiness
         resultDict['합계'] = totalDataFrame
-
         return resultDict
 
 #  내일 이거 사용할 것

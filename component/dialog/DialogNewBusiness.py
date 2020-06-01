@@ -2,27 +2,29 @@ from datetime import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connBusiness import connBusiness
+from connector.connDB import connDB
 from component.dialog.DialogMassage import DialogMassage
-from component.material.GeneralLineEdit import GeneralLineEdit
-from component.material.GeneralLabel import GeneralLabel
-from component.material.GeneralTextEdit import GeneralTextEdit
-from component.material.GeneralComboBox import GeneralComboBox
+from material.GeneralLineEdit import GeneralLineEdit
+from material.GeneralLabel import GeneralLabel
+from material import GeneralTextEdit
+from material import GeneralComboBox
 
 
 class DialogNewBusiness(QDialog):
-    def __init__(self, parent):
+    def __init__(self, widget):
         QDialog.__init__(self)
+        self.widget = widget
         self.__setting__()
         self.__connector__()
         self.__variables__()
         self.__component__()
-        self.parent = parent
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
 
     def __connector__(self):
         self.connBusiness = connBusiness()
+        self.connDB = connDB(self.widget.windows.CURRENT_YEAR)
 
     def __variables__(self):
         pass
@@ -145,11 +147,11 @@ class DialogNewBusiness(QDialog):
             elif businessInfo[1] == '':
                 DialogMassage('사업코드를 입력하세요.')
             else:
-                self.connBusiness.insertBusiness(businessInfo)
-                try:
-                    self.parent.window.refresh()
-                except Exception as e:
-                    print(e)
+                number = self.connBusiness.insertBusiness(businessInfo)
+                self.widget.windows.refresh()
+                self.connDB.insertNewBusiness(number)
+                DialogMassage('반영되었습니다.')
+                self.close()
 
         self.btnInsert = QPushButton('입력')
         self.btnInsert.setCursor(Qt.PointingHandCursor)

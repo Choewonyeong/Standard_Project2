@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from connector.connUser import connUser
 from component.dialog.DialogMassage import DialogMassage
+from material.LineEdit import LdtLogin
 import setting
 
 
@@ -16,7 +17,7 @@ class Login(QDialog):
         self.__component__()
 
     def __setting__(self):
-        # self.setStyleSheet()
+        self.setStyleSheet()
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setFixedWidth(400)
         self.setFixedHeight(600)
@@ -44,15 +45,9 @@ class Login(QDialog):
         self.lblLogo.setAlignment(Qt.AlignCenter)
 
     def __lineEdit__(self):
-        self.ldtAccount = QLineEdit()
-        self.ldtAccount.setMouseTracking(False)
-        self.ldtAccount.setPlaceholderText('Account')
-        self.ldtAccount.setAlignment(Qt.AlignCenter)
-        self.ldtPassword = QLineEdit()
-        self.ldtPassword.setMouseTracking(False)
-        self.ldtPassword.setPlaceholderText('Password')
+        self.ldtAccount = LdtLogin('', 'Account')
+        self.ldtPassword = LdtLogin('', 'Password')
         self.ldtPassword.setEchoMode(QLineEdit.Password)
-        self.ldtPassword.setAlignment(Qt.AlignCenter)
 
     def __pushButton__(self):
         def btnCloseClick():

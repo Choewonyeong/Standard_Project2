@@ -25,7 +25,4 @@ from method import dateList
 # print(text)
 
 connDB = connDB('2020')
-columns = connDB.dataFramePerUserTime('admin', column=True)[8:]
-# query = f"SUM(`{'`), SUM(`'.join(columns)}`)"
-total = connDB.test(columns, 'admin')
-print(total)
+connDB.createDB()

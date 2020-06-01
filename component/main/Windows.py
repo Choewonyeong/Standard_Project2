@@ -1,26 +1,25 @@
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from connector.connUser import connUser
 from component.main.Login import Login
-from component.material.WindowMainList import WindowMainList
-from component.material.WindowSubList import WindowSubList
+from material import WindowMainList
+from material import WindowSubList
 from component.dialog.DialogUserSelf import DialogUserSelf
 from component.dialog.DialogMassage import DialogMassage
-from component.dialog.DialogNewUser import DialogNewUser
-from component.groupBox.GroupBoxUserTime import GroupBoxUserTime
-from component.groupBox.GroupBoxAdminBusiness import GroupBoxAdminBusiness
-from component.groupBox.GroupBoxAdminUser import GroupBoxAdminUser
-from component.groupBox.GroupBoxInquiryUser import GroupBoxInquiryUser
-from component.groupBox.GroupBoxNewUser import GroupBoxNewUser
-from component.groupBox.GroupBoxDatabase import GroupBoxDatabase
-from component.groupBox.GroupBoxTotalPerYear import GroupBoxTotalPerYear
-from component.groupBox.GroupBoxTotalPerUser import GroupBoxTotalPerUser
+from component.main.MainUserTime import MainUserTime
+from component.main.MainAdminBusiness import MainAdminBusiness
+from component.main.MainAdminUser import MainAdminUser
+from component.main.MainInquiryUser import MainInquiryUser
+from component.main.MainNewUser import MainNewUser
+from component.main.MainDatabase import MainDatabase
+from component.main.MainTotalPerYear import MainTotalPerYear
+from component.main.MainTotalPerUser import MainTotalPerUser
 from datetime import date
 import setting
 
 
 class Windows(QWidget):
+    CURRENT_YEAR = str(date.today().year)
     TIME_YEAR = str(date.today().year)
     DB_YEAR = str(date.today().year)
     TOTAL_YEAR = str(date.today().year)
@@ -51,7 +50,7 @@ class Windows(QWidget):
         self.name = self.connUser.returnName(self.account)
         self.itemMain = [self.name, '조회', '관리', '로그아웃']
         self.itemUser = ['개인정보', '시간관리']
-        self.itemInquiry = ['부서원 정보 조회', '연도별시간집계', '사업별시간집계']
+        self.itemInquiry = ['부서원 정보 조회', '연도별시간집계', '부서원별시간집계']
         self.itemAdmin = ['회원가입 신청 현황', '부서원 정보 관리', '사업 정보 관리', '데이터베이스 관리']
         self.valueUser = False
         self.valueInquiry = False
@@ -112,7 +111,7 @@ class Windows(QWidget):
                 pass
             elif menu == self.itemUser[1]:
                 try:
-                    self.tab.addTab(GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
+                    self.tab.addTab(MainUserTime(self.account, self.TIME_YEAR), menu)
                     self.currentTab.append(menu)
                     self.tab.setCurrentIndex(self.currentIdx)
                     self.currentIdx += 1
@@ -126,23 +125,20 @@ class Windows(QWidget):
         def lstInquiryItemClick(item):
             menu = item.text()
             if menu == self.itemInquiry[0] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxInquiryUser(), menu)
+                self.tab.addTab(MainInquiryUser(), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
-            elif menu == self.itemInquiry[1]:
-                self.tab.addTab(GroupBoxTotalPerYear(), menu)
+            elif menu == self.itemInquiry[1] and menu not in self.currentTab:
+                self.tab.addTab(MainTotalPerYear(), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
-            elif menu == self.itemInquiry[2]:
-                try:
-                    self.tab.addTab(GroupBoxTotalPerUser(self), menu)
-                    self.currentTab.append(menu)
-                    self.tab.setCurrentIndex(self.currentIdx)
-                    self.currentIdx += 1
-                except Exception as e:
-                    print(e)
+            elif menu == self.itemInquiry[2] and menu not in self.currentTab:
+                self.tab.addTab(MainTotalPerUser(self), menu)
+                self.currentTab.append(menu)
+                self.tab.setCurrentIndex(self.currentIdx)
+                self.currentIdx += 1
             else:
                 self.tab.setCurrentIndex(self.currentTab.index(menu))
         self.lstInquiry = WindowSubList(self.itemInquiry)
@@ -151,19 +147,29 @@ class Windows(QWidget):
         def lstAdminItemClick(item):
             menu = item.text()
             if menu == self.itemAdmin[0] and menu not in self.currentTab:
-                DialogNewUser()
+                widget = MainNewUser(self)
+                if len(widget.dataFrame):
+                    self.tab.addTab(widget, menu)
+                    self.currentTab.append(menu)
+                    self.tab.setCurrentIndex(self.currentIdx)
+                    self.currentIdx += 1
+                else:
+                    DialogMassage('신청 대상이 없습니다.')
             elif menu == self.itemAdmin[1] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxAdminUser(), menu)
+                self.tab.addTab(MainAdminUser(self), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
             elif menu == self.itemAdmin[2] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxAdminBusiness(), menu)
-                self.currentTab.append(menu)
-                self.tab.setCurrentIndex(self.currentIdx)
-                self.currentIdx += 1
+                try:
+                    self.tab.addTab(MainAdminBusiness(self), menu)
+                    self.currentTab.append(menu)
+                    self.tab.setCurrentIndex(self.currentIdx)
+                    self.currentIdx += 1
+                except Exception as e:
+                    print(e)
             elif menu == self.itemAdmin[3] and menu not in self.currentTab:
-                self.tab.addTab(GroupBoxDatabase(self), menu)
+                self.tab.addTab(MainDatabase(self), menu)
                 self.currentTab.append(menu)
                 self.tab.setCurrentIndex(self.currentIdx)
                 self.currentIdx += 1
@@ -188,30 +194,30 @@ class Windows(QWidget):
         self.tab.tabCloseRequested.connect(tabCloseRequest)
 
         def tabBarClick(idx):
-            print(self.DB_YEAR)
             try:
                 menu = self.currentTab[idx]
                 self.tab.removeTab(idx)
+
                 if menu == self.itemUser[0]:
                     pass
                 elif menu == self.itemUser[1]:
-                    self.tab.insertTab(idx, GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
+                    self.tab.insertTab(idx, MainUserTime(self.account, self.TIME_YEAR), menu)
                 elif menu == self.itemInquiry[0]:
-                    self.tab.insertTab(idx, GroupBoxInquiryUser(), menu)
+                    self.tab.insertTab(idx, MainInquiryUser(), menu)
                 elif menu == self.itemInquiry[1]:
-                    pass
+                    self.tab.insertTab(idx, MainTotalPerYear(), menu)
                 elif menu == self.itemInquiry[2]:
-                    pass
+                    self.tab.insertTab(idx, MainTotalPerUser(self), menu)
                 elif menu == self.itemAdmin[0]:
-                    self.tab.insertTab(idx, GroupBoxNewUser(), menu)
+                    self.tab.insertTab(idx, MainNewUser(self), menu)
                 elif menu == self.itemAdmin[1]:
-                    self.tab.insertTab(idx, GroupBoxAdminUser(), menu)
+                    self.tab.insertTab(idx, MainAdminUser(self), menu)
                 elif menu == self.itemAdmin[2]:
-                    self.tab.insertTab(idx, GroupBoxAdminBusiness(), menu)
+                    self.tab.insertTab(idx, MainAdminBusiness(self), menu)
                 elif menu == self.itemAdmin[3]:
-                    self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
+                    self.tab.insertTab(idx, MainDatabase(self), menu)
             except Exception as e:
-                print(e)
+                print('tabBarClick', e)
         self.tab.tabBarClicked.connect(tabBarClick)
 
     def __layout__(self):
@@ -231,21 +237,21 @@ class Windows(QWidget):
             if menu == self.itemUser[0]:
                 pass
             elif menu == self.itemUser[1]:
-                self.tab.insertTab(idx, GroupBoxUserTime(self.account, self.TIME_YEAR), menu)
+                self.tab.insertTab(idx, MainUserTime(self.account, self.TIME_YEAR), menu)
             elif menu == self.itemInquiry[0]:
-                self.tab.insertTab(idx, GroupBoxInquiryUser(), menu)
+                self.tab.insertTab(idx, MainInquiryUser(), menu)
             elif menu == self.itemInquiry[1]:
-                pass
+                self.tab.insertTab(idx, MainTotalPerYear(), menu)
             elif menu == self.itemInquiry[2]:
-                pass
+                self.tab.insertTab(idx, MainTotalPerUser(self), menu)
             elif menu == self.itemAdmin[0]:
-                self.tab.insertTab(idx, GroupBoxNewUser(), menu)
+                self.tab.insertTab(idx, MainNewUser(self), menu)
             elif menu == self.itemAdmin[1]:
-                self.tab.insertTab(idx, GroupBoxAdminUser(), menu)
+                self.tab.insertTab(idx, MainAdminUser(self), menu)
             elif menu == self.itemAdmin[2]:
-                self.tab.insertTab(idx, GroupBoxAdminBusiness(), menu)
+                self.tab.insertTab(idx, MainAdminBusiness(self), menu)
             elif menu == self.itemAdmin[3]:
-                self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
+                self.tab.insertTab(idx, MainDatabase(self), menu)
         except Exception as e:
             print(e)
 
@@ -253,12 +259,12 @@ class Windows(QWidget):
         menu = self.itemAdmin[3]
         idx = self.currentTab.index(menu)
         self.tab.removeTab(idx)
-        self.tab.insertTab(idx, GroupBoxDatabase(self), menu)
+        self.tab.insertTab(idx, MainDatabase(self), menu)
         self.tab.setCurrentIndex(idx)
 
     def refreshTotalPerUser(self):
         menu = self.itemInquiry[2]
         idx = self.currentTab.index(menu)
         self.tab.removeTab(idx)
-        self.tab.insertTab(idx, GroupBoxTotalPerUser(self), menu)
+        self.tab.insertTab(idx, MainTotalPerUser(self), menu)
         self.tab.setCurrentIndex(idx)

@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connUser import connUser
-from component.material.GeneralLineEdit import GeneralLineEdit
-from component.material.GeneralLabel import GeneralLabel
+from material.GeneralLineEdit import GeneralLineEdit
+from material.GeneralLabel import GeneralLabel
 from component.dialog.DialogPassword import DialogPassword
 from component.dialog.DialogMassage import DialogMassage
 

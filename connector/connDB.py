@@ -44,8 +44,8 @@ class connDB:
 
     def __createSource__(self):
         try:
-            self.sourceUser = self.connUser.returnSource()
-            sourceBusiness = self.connBusiness.returnSource()
+            self.sourceUser = self.connUser.returnSources()
+            sourceBusiness = self.connBusiness.returnSources()
             self.sourceBusiness = []
             for idx, source in enumerate(sourceBusiness):
                 if source[0] == '0':
@@ -204,3 +204,65 @@ class connDB:
             conn.close()
         except Exception as e:
             print('updateUserTime', e)
+
+    def insertNewBusiness(self, number):
+        try:
+            conn = self.__conn__()
+            businessInfo = self.connBusiness.returnSource(number)
+            sourceBusiness = []
+            if businessInfo[0] == '0':
+                for option in ['회의', '교육/훈련', '기타업무']:
+                    sourceBusiness.append(businessInfo+[option])
+
+            if businessInfo[0] != '0':
+                for option in ['사업관리', '기술업무']:
+                    sourceBusiness.append(businessInfo+[option])
+
+            for userSource in self.connUser.returnSources():
+                for idx, businessSource in enumerate(sourceBusiness):
+                    query = f"""insert into Main(`번호`, `사업명`, `사업코드`, `구분`, `적용상태_사업`, 
+                                `계정`, `성명`, `적용상태_부서원`) Values(?, ?, ?, ?, ?, ?, ?, ?);"""
+                    conn.execute(query, businessSource+['적용']+userSource+['적용'])
+            conn.close()
+        except Exception as e:
+            print(e)
+
+    def insertNewUser(self, account):
+        try:
+            conn = self.__conn__()
+            userInfo = self.connUser.returnSource(account)
+            businessInfo = self.connBusiness.returnSources()
+            sourceBusiness = []
+            for idx, source in enumerate(businessInfo):
+                if source[0] == '0':
+                    for option in ['회의', '교육/훈련', '기타업무']:
+                        sourceBusiness.append(source+[option])
+                if source[0] != '0':
+                    for option in ['사업관리', '기술업무']:
+                        sourceBusiness.append(source+[option])
+
+            for idx, businessSource in enumerate(sourceBusiness):
+                query = f"""insert into Main(`번호`, `사업명`, `사업코드`, `구분`, `적용상태_사업`, 
+                            `계정`, `성명`, `적용상태_부서원`) Values(?, ?, ?, ?, ?, ?, ?, ?);"""
+                conn.execute(query, businessSource+['적용']+userInfo+['적용'])
+            conn.close()
+        except Exception as e:
+            print(e)
+
+    def deleteBusiness(self, number):
+        try:
+            conn = self.__conn__()
+            query = f"delete from Main where `번호`='{number}';"
+            conn.execute(query)
+            conn.close()
+        except Exception as e:
+            print(e)
+
+    def deleteUser(self, account):
+        try:
+            conn = self.__conn__()
+            query = f"delete from Main where `계정`='{account}';"
+            conn.execute(query)
+            conn.close()
+        except Exception as e:
+            print(e)

@@ -1,14 +1,18 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from component.dialog.DialogMassage import DialogMassage
+from connector.connDB import connDB
+from connector.connUser import connUser
 
 
 class TableNewUser(QTableWidget):
-    def __init__(self, columns, dataFrame):
+    def __init__(self, widget, columns, dataFrame):
         QTableWidget.__init__(self)
+        self.widget = widget
         self.columns = columns
         self.dataFrame = dataFrame
         self.__setting__()
+        self.__connector__()
         self.__setData__()
 
     def __setting__(self):
@@ -17,11 +21,16 @@ class TableNewUser(QTableWidget):
         self.setHorizontalHeaderLabels(self.columns)
         self.verticalHeader().setVisible(False)
 
+    def __connector__(self):
+        self.connUser = connUser()
+        self.connDB = connDB(self.widget.windows.CURRENT_YEAR)
+
     def __btnAccept__(self, row):
         def btnAcceptClick():
             r = self.currentRow()
             account = self.item(r, 0).text()
             self.connUser.acceptNewUser(account)
+            self.connDB.insertNewUser(account)
             self.removeRow(r)
         btnAccept = QPushButton('승인')
         btnAccept.setFixedWidth(80)

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connDB import connDB
-from component.material.BtnTableDBUser import BtnTableDBUser
+from material.BtnTableDBUser import BtnTableDBUser
 
 
 class TableDBUser(QTableWidget):

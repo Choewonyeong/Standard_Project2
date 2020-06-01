@@ -9,14 +9,11 @@ import setting
 def returnBusinesses(year):
     try:
         conn = connect(f"{setting.databaseMain}/{year}.db")
-        query = f"select `사업명` From Main Where `적용상태_사업`='적용' and `적용상태_부서원`='적용';"
+        query = f"select `사업명` From Main Where `적용상태_사업`='적용' and `적용상태_부서원`='적용' order by `번호`;"
         run = conn.execute(query)
-        fetchData = [data[0] for data in run.fetchall()]
+        dataFrame = DataFrame(data=run.fetchall(), columns=['사업명'])
         conn.close()
-        businesses = []
-        for business in fetchData:
-            if business not in businesses:
-                businesses.append(business)
+        businesses = dataFrame['사업명'].drop_duplicates().tolist()
         return businesses
     except Exception as e:
         print('returnBusinesses', e)
@@ -44,3 +41,4 @@ def runQuery_return(year, query):
         return total
     except Exception as e:
         print('runQuery_return', e)
+        return [0]

@@ -61,8 +61,8 @@ class connBusiness:
             print('deleteBusiness', e)
 
     def insertBusiness(self, businessInfo):
+        number = 0 if not self.returnNumbers()[0:-1] else max(self.returnNumbers()[0:-1])+1
         try:
-            number = 0 if not self.returnNumbers()[0:-1] else max(self.returnNumbers()[0:-1])+1
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             businessInfo = [str(number)]+businessInfo
             businessInfo.append(now)
@@ -70,24 +70,15 @@ class connBusiness:
             query = f"""insert into Business Values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
             conn.execute(query, businessInfo)
             conn.close()
+            return number
         except Exception as e:
             print('insertBusiness', e)
+            return number
 
-    def returnFilterItem(self, header):
+    def returnSources(self):
         try:
             conn = self.__conn__()
-            query = f"select `{header}` from Business;"
-            run = conn.execute(query)
-            items = [item[0] for item in run.fetchall()]
-            conn.close()
-            return items
-        except Exception as e:
-            print('returnFilterItem', e)
-
-    def returnSource(self):
-        try:
-            conn = self.__conn__()
-            query = "select `번호`, `사업명`, `사업코드` from Business;"
+            query = "select `번호`, `사업명`, `사업코드` from Business order by `번호`;"
             run = conn.execute(query)
             sources = [list(source) for source in run.fetchall()]
             conn.close()
@@ -96,10 +87,23 @@ class connBusiness:
             print('returnSource', e)
             return []
 
+    def returnSource(self, number):
+        try:
+            conn = self.__conn__()
+            query = f"select `번호`, `사업명`, `사업코드` from Business where `번호`='{number}';"
+            run = conn.execute(query)
+            source = list(run.fetchall()[0])
+            print(source)
+            conn.close()
+            return source
+        except Exception as e:
+            print('returnSource', e)
+            return []
+
     def returnBusinesses(self):
         try:
             conn = self.__conn__()
-            query = "select `사업명` from Business;"
+            query = "select `사업명` from Business order by `번호`;"
             run = conn.execute(query)
             listBusiness = [business[0] for business in run.fetchall()]
             conn.close()

@@ -14,7 +14,6 @@ class Signup(QDialog):
         self.__component__()
 
     def __setting__(self):
-        # self.setStyleSheet()
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setFixedWidth(250)
 
@@ -87,9 +86,11 @@ class Signup(QDialog):
 
         self.rbtCarTrue = QRadioButton('유')
         self.rbtCarTrue.clicked.connect(rbtCarTrueClick)
-        self.rbtCarTrue.setChecked(True)
         self.rbtCarFalse = QRadioButton('무')
         self.rbtCarFalse.clicked.connect(rbtCarFalseClick)
+        self.rbtCarFalse.setChecked(True)
+        self.lblCarType.setVisible(False)
+        self.lblCarNumber.setVisible(False)
         layoutRbt = QHBoxLayout()
         layoutRbt.addWidget(self.rbtCarTrue)
         layoutRbt.addWidget(self.rbtCarFalse)
@@ -134,6 +135,7 @@ class Signup(QDialog):
                 self.connUser.insertNewUser(userInfo)
                 admins = self.connUser.returnAdmins()
                 DialogMassage(f"회원가입 신청이 완료되었습니다.\n관리자에게 승인을 요청하세요.\n관리자 : {', '.join(admins)}")
+                self.close()
         self.btnSignup = QPushButton('신청')
         self.btnSignup.setDefault(True)
         self.btnSignup.setCursor(Qt.PointingHandCursor)

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connDB import connDB
-from component.material.BtnTableDBBusiness import BtnTableDBBusiness
+from material import BtnTableDBBusiness
 
 
 class TableDBBusiness(QTableWidget):

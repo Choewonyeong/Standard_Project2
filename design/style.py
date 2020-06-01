@@ -4,10 +4,6 @@ QSplashScreen{
 }
 """
 
-
-
-
-
 PushButton_Excel = """
 QPushButton{
     color: white;

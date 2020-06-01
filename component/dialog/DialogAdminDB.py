@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
-from component.material.GeneralComboBox import GeneralComboBox
+from material import GeneralComboBox
 from component.table.TableDBUser import TableDBUser
 from component.table.TableDBBusiness import TableDBBusiness
 from method.dbList import returnMainList
