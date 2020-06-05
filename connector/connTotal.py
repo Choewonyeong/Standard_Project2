@@ -36,7 +36,7 @@ def runQuery_return(year, query):
     try:
         conn = connect(f"{setting.databaseMain}/{year}.db")
         run = conn.execute(query)
-        total = list(run.fetchall()[0])
+        total = [0.0 if not value else float(value) for value in run.fetchall()[0]]
         conn.close()
         return total
     except Exception as e:

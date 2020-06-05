@@ -76,7 +76,7 @@ class connUser:
     def dataFrameSignup(self, column=False):
         try:
             conn = self.__conn__()
-            query = "select `계정`, `성명`, `수정한날짜` from User Where not `가입승인여부`='승인';"
+            query = "select `계정`, `성명`, `주민등록번호`, `연락처`, `가입승인여부`, `수정한날짜` from User Where not `가입승인여부`='승인';"
             run = conn.execute(query)
             columns = [column[0] for column in run.description]
             if column:
@@ -146,12 +146,10 @@ class connUser:
             if column:
                 columns = [column[0] for column in run.description]
                 conn.close()
-                print(columns)
                 return columns
             else:
                 userInfo = list(run.fetchall()[0])
                 conn.close()
-                print(userInfo)
                 return userInfo
         except Exception as e:
             print('returnUserInfo', e)
@@ -265,12 +263,36 @@ class connUser:
     def returnNames(self):
         try:
             conn = self.__conn__()
-            query = "select `성명` from User where not `계정`='master';"
+            query = "select `성명` from User where not `계정`='master' and `가입승인여부`='승인';"
             run = conn.execute(query)
             names = [name[0] for name in run.fetchall()]
             conn.close()
             return names
         except Exception as e:
             print('returnNames', e)
+            return []
+
+    def returnAccountsAccept(self):
+        try:
+            conn = self.__conn__()
+            query = "select `계정` from User Where not `계정`='master' and `가입승인여부`='승인';"
+            run = conn.execute(query)
+            userIds = [account[0] for account in run.fetchall()]
+            conn.close()
+            return userIds
+        except Exception as e:
+            print('returnAccounts', e)
+            return []
+
+    def returnStanByAccounts(self):
+        try:
+            conn = self.__conn__()
+            query = "select `계정` from User Where not `가입승인여부`='승인';"
+            run = conn.execute(query)
+            userIds = [account[0] for account in run.fetchall()]
+            conn.close()
+            return userIds
+        except Exception as e:
+            print('returnAccounts', e)
             return []
 

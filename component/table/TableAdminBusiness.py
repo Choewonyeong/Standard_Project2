@@ -1,22 +1,30 @@
 from datetime import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-from material import FilterComboBox
 from connector.connBusiness import connBusiness
 from material import TableLineEdit
 from material import TableComboBox
 from material import BtnTableBusinessDelete
+from material.ComboBox import CbxFilterInTable, CbxToolInTable
+from material.LineEdit import LdtAdminBusinessInTable
+from material.PushButton import BtnDeleteInTable
 
 
 class TableAdminBusiness(QTableWidget):
     def __init__(self, widget):
         QTableWidget.__init__(self)
         self.widget = widget
+        print(1)
         self.__connector__()
+        print(2)
         self.__variables__()
+        print(3)
         self.__setting__()
+        print(4)
         self.__setFilter__()
+        print(5)
         self.__setData__()
+        print(6)
 
     def __connector__(self):
         self.connBusiness = connBusiness()
@@ -35,7 +43,6 @@ class TableAdminBusiness(QTableWidget):
 
     def __setFilter__(self):
         self.insertRow(0)
-        self.setRowHeight(0, 20)
         for idx, header in enumerate(self.columns):
             if header in ['번호', '수정한날짜', '설정']:
                 item = QTableWidgetItem('')
@@ -45,8 +52,8 @@ class TableAdminBusiness(QTableWidget):
                 items = self.dataFrame[header].tolist()
                 items.remove(items[0])
                 items.remove(items[-1])
-                items = ['필터'] + list(tuple(set(items)))
-                FilterComboBox(idx, items, self)
+                items = ['전체'] + list(tuple(set(items)))
+                CbxFilterInTable(idx, items, self)
 
     def __setData__(self):
         for row, lst in enumerate(self.dataFrame.values):
@@ -54,32 +61,32 @@ class TableAdminBusiness(QTableWidget):
             for col, data in enumerate(lst):
                 data = str(data)
                 item = QTableWidgetItem(data)
-                item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row+1, col, item)
                 if col in [1, 2, 4, 5, 10, 11, 12]:
-                    obj = TableLineEdit(row+1, col, data, self)
-                    self.objects.append(obj)
+                    widget = LdtAdminBusinessInTable(row+1, col, data, self)
+                    self.objects.append(widget)
                 elif col == 3:
-                    obj = TableComboBox(row+1, col, ['기술', '연구', '국책', '일반', '기타'], data, self)
-                    self.objects.append(obj)
+                    widget = CbxToolInTable(row+1, col, ['기술', '연구', '국책', '일반', '기타'], data, self)
+                    self.objects.append(widget)
                 elif col in [6, 7]:
-                    obj = TableLineEdit(row+1, col, data, self, option='dateFormat')
-                    obj.textEdited.connect(self.TableLineEditChange)
-                    self.objects.append(obj)
+                    widget = LdtAdminBusinessInTable(row+1, col, data, self)
+                    widget.textEdited.connect(self.TableLineEditChange)
+                    self.objects.append(widget)
                 elif col == 8:
-                    obj = TableLineEdit(row+1, col, data, self, option='disable')
-                    self.objects.append(obj)
+                    widget = LdtAdminBusinessInTable(row+1, col, data, self)
+                    widget.setEnabled(False)
+                    self.objects.append(widget)
                 elif col == 9:
-                    obj = TableLineEdit(row+1, col, data, self, option='dateFormat')
-                    self.objects.append(obj)
+                    widget = LdtAdminBusinessInTable(row+1, col, data, self)
+                    self.objects.append(widget)
                 elif col == 13:
-                    obj = TableLineEdit(row+1, col, data, self, option='moneyFormat')
-                    self.objects.append(obj)
+                    widget = LdtAdminBusinessInTable(row+1, col, data, self)
+                    self.objects.append(widget)
                 elif col == 14:
-                    obj = TableComboBox(row+1, col, ['수주', '진행', '중단', '준공', 'A/S'], data, self)
-                    self.objects.append(obj)
+                    widget = CbxToolInTable(row+1, col, ['수주', '진행', '중단', '준공', 'A/S'], data, self)
+                    self.objects.append(widget)
             col = len(self.columns)-1
-            btn = BtnTableBusinessDelete(row+1, col, '삭제', self)
+            BtnDeleteInTable('삭제', self, row+1, col)
         self.resizeColumnsToContents()
         self.hideColumn(0)
         self.hideRow(1)
@@ -115,7 +122,7 @@ class TableAdminBusiness(QTableWidget):
     def Filter(self, col, filterText):
         self.Show()
         for row in range(1, self.rowCount()):
-            if self.cellWidget(0, col).currentText() == '필터':
+            if self.cellWidget(0, col).currentText() == '전체':
                 self.Show()
             elif col in [3, 14] and self.cellWidget(row, col).currentText() != filterText:
                 self.hideRow(row)

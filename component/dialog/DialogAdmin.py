@@ -1,15 +1,21 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtCore import Qt
 from connector.connUser import connUser
-from material.GeneralLineEdit import GeneralLineEdit
-from material.GeneralLabel import GeneralLabel
 from component.dialog.DialogPassword import DialogPassword
 from component.dialog.DialogMassage import DialogMassage
+from material.Label import LblMessage
+from material.LineEdit import LdtEditPasswordLeft
+from material.PushButton import BtnNo
+from material.PushButton import BtnYes
+from design.style.Dialog import styleGeneral
 
 
 class DialogAdmin(QDialog):
     def __init__(self, account, row, table):
         QDialog.__init__(self)
+        self.setStyleSheet(styleGeneral)
         self.account = account
         self.row = row
         self.table = table
@@ -21,6 +27,7 @@ class DialogAdmin(QDialog):
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setFixedWidth(350)
 
     def __connector__(self):
         self.connUser = connUser()
@@ -36,17 +43,15 @@ class DialogAdmin(QDialog):
         self.__layout__()
 
     def __label__(self):
-        self.lblPassword = GeneralLabel('관리자의 권한이 필요합니다.\n비밀번호를 입력하세요.')
+        self.lblPassword = LblMessage('관리자의 권한이 필요합니다.\n비밀번호를 입력하세요.')
 
     def __lineEdit__(self):
-        self.ldtPassword = GeneralLineEdit()
-        self.ldtPassword.setEchoMode(QLineEdit.Password)
+        self.ldtPassword = LdtEditPasswordLeft()
 
     def __pushButton__(self):
         def btnCloseClick():
             self.close()
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.clicked.connect(btnCloseClick)
+        self.btnClose = BtnNo('닫기', btnCloseClick)
 
         def btnConfirmClick():
             password = self.ldtPassword.text()
@@ -57,9 +62,7 @@ class DialogAdmin(QDialog):
                 DialogPassword(userName, self.account, userPassword, self.row, self.table)
             else:
                 DialogMassage('비밀번호가 맞지 않습니다.')
-        self.btnConfirm = QPushButton('확인')
-        self.btnConfirm.clicked.connect(btnConfirmClick)
-        self.btnConfirm.setShortcut('return')
+        self.btnConfirm = BtnYes('확인', btnConfirmClick, default=True, shortcut='return')
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()

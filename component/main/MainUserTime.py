@@ -1,32 +1,35 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from component.dialog.DialogMassage import DialogMassage
 from component.table.TableTimeUser import TableTimeUser
 from component.table.TableTimeBusiness import TableTimeBusiness
 from component.table.TableTimeHeader import TableTimeHeader
 from component.table.TableTimeTotal import TableTimeTotal
+from design.style.Dialog import styleGeneral
+from material.Label import LblNull
+from material.PushButton import BtnTool
+from material.PushButton import BtnTabClose
 from method.valueTran import returnTranValue
 from connector.connDB import connDB
+from datetime import datetime
 
 
-class MainUserTime(QGroupBox):
-    def __init__(self, account, year):
-        QGroupBox.__init__(self)
-        self.account = account
-        self.year = year
-        self.__setting__()
+class MainUserTime(QWidget):
+    def __init__(self, windows):
+        QWidget.__init__(self)
+        self.setStyleSheet(styleGeneral)
+        self.windows = windows
+        self.account = windows.account
+        self.year = windows.CURRENT_YEAR
         self.__connector__()
-        self.__variables__()
         self.__component__()
-        self.__setEvent__()
-
-    def __setting__(self):
-        pass
+        self.btnToday.click()
 
     def __connector__(self):
         self.connDB = connDB(self.year)
-
-    def __variables__(self):
-        pass
 
     def __component__(self):
         self.__pushButton__()
@@ -35,7 +38,14 @@ class MainUserTime(QGroupBox):
         self.__layout__()
 
     def __pushButton__(self):
+        def btnCloseClick():
+            idx = self.windows.tab.currentIndex()
+            self.windows.tab.removeTab(idx)
+            self.windows.currentTabs.pop(idx)
+        self.btnClose = BtnTabClose('닫기(Esc)', btnCloseClick)
+
         def btnSaveClick():
+            cnt = 0
             for obj in self.tblTime.objects:
                 if obj.editLog:
                     column = self.tblTime.horizontalHeaderItem(obj.col).text()
@@ -43,20 +53,44 @@ class MainUserTime(QGroupBox):
                     number = self.tblTime.item(obj.row, 0).text()
                     option = self.tblTime.item(obj.row, 3).text()
                     self.connDB.updateUserTime(column, value, number, option, self.account)
-            DialogMassage('저장되었습니다.')
-        self.btnSave = QPushButton('저장')
-        self.btnSave.clicked.connect(btnSaveClick)
+                    obj.init = value
+                    obj.editLog = False
+                    cnt += 1
+            if cnt:
+                DialogMassage('저장되었습니다.')
+        self.btnSave = BtnTool('저장(Ctrl+S)', btnSaveClick, shortcut='Ctrl+S')
+
+        def btnTodayClick():
+            today = datetime.today()
+            today = today.strftime("%m/%d")
+            for col, header in enumerate(self.tblTime.columns):
+                if today in header:
+                    self.tblTime.setCurrentCell(0, col)
+                    break
+        self.btnToday = BtnTool('오늘(Ctrl+T)', btnTodayClick, shortcut='Ctrl+T')
+
+        def btnRefreshClick():
+            # windows에서 한꺼번에 구현할 것
+            pass
+
+        self.btnRefresh = BtnTool('새로고침(F5)', btnRefreshClick, shortcut='F5')
 
         def btnExcelClick():
-            # 구현 필요
-            pass
-            DialogMassage('엑셀로 내보내기가 완료되었습니다.')
-        self.btnExcel = QPushButton('엑셀로 저장')
-        self.btnExcel.clicked.connect(btnExcelClick)
+            dig = QFileDialog()
+            filePath = dig.getSaveFileName(caption='엑셀로 내보내기', filter='*.xlsx')[0]
+            if filePath != '':
+                df = self.connDB.dataFramePerUserTime(self.account)
+                del df['적용상태_사업']
+                del df['계정']
+                del df['성명']
+                del df['적용상태_부서원']
+                df.to_excel(filePath, sheet_name=f'{self.year}-{self.account}', index=False)
+                DialogMassage(f'저장되었습니다.\n\n○ 파일 경로 : {filePath}')
+        self.btnExcel = BtnTool('엑셀로 저장\n(Ctrl+E)', btnExcelClick)
 
     def __table__(self):
         self.tblBusiness = TableTimeBusiness(self.account, self.year)
-        self.tblTime = TableTimeUser(self.account, self.year)
+        self.tblTime = TableTimeUser(self.account, self.year, self)
         self.tblHeader = TableTimeHeader()
         self.tblHeader.setColumnWidth(0, self.tblBusiness.width)
         self.tblHeader.setFixedWidth(self.tblBusiness.width)
@@ -65,23 +99,35 @@ class MainUserTime(QGroupBox):
         self.tblTotal.setFixedHeight(self.tblHeader.rowHeight(0))
 
     def __scrollBar__(self):
+
+        def verScrBusinessChange(value):
+            self.verScrTime.setValue(value)
+        self.verScrBusiness = self.tblBusiness.verticalScrollBar()
+        self.verScrBusiness.valueChanged.connect(verScrBusinessChange)
+
         def verScrTimeChange(value):
             self.verScrBusiness.setValue(value)
-        self.verScrBusiness = self.tblBusiness.verticalScrollBar()
         self.verScrTime = self.tblTime.verticalScrollBar()
         self.verScrTime.valueChanged.connect(verScrTimeChange)
 
         def horScrTimeChange(value):
             self.horScrTotal.setValue(value)
-        self.horScrTotal = self.tblTotal.horizontalScrollBar()
         self.horScrTime = self.tblTime.horizontalScrollBar()
         self.horScrTime.valueChanged.connect(horScrTimeChange)
 
+        def horScrTotalChange(value):
+            self.horScrTime.setValue(value)
+        self.horScrTotal = self.tblTotal.horizontalScrollBar()
+        self.horScrTotal.valueChanged.connect(horScrTotalChange)
+
     def __layout__(self):
         layoutBtn = QHBoxLayout()
+        layoutBtn.addWidget(self.btnClose)
         layoutBtn.addWidget(self.btnSave)
+        layoutBtn.addWidget(self.btnToday)
+        layoutBtn.addWidget(self.btnRefresh)
         layoutBtn.addWidget(self.btnExcel)
-        layoutBtn.addWidget(QLabel(''), 10)
+        layoutBtn.addWidget(LblNull(), 10)
         layoutTop = QHBoxLayout()
         layoutTop.addWidget(self.tblHeader)
         layoutTop.addWidget(self.tblTotal)
@@ -100,19 +146,23 @@ class MainUserTime(QGroupBox):
         layout.addLayout(layoutScr)
         self.setLayout(layout)
 
-    def __setEvent__(self):
-        def tblTimeCellChange(_, col):
+    def changeTotalValue(self, _):
+        ldtTime = self.sender()
+        table = ldtTime.table
+        values = []
+        for row in range(self.tblTime.rowCount()):
+            value = table.cellWidget(row, ldtTime.col).text()
             try:
-                values = []
-                for row in range(self.tblTime.rowCount()):
-                    value = self.tblTime.item(row, col).text()
-                    try:
-                        value = float(value)
-                    except:
-                        value = 0.0
-                    values.append(value)
-                value = returnTranValue(sum(values))
-                self.tblTotal.cellWidget(0, col-8).setText(str(value))
-            except Exception as e:
-                print(e)
-        self.tblTime.cellChanged.connect(tblTimeCellChange)
+                value = float(value)
+            except:
+                value = 0.0
+            values.append(value)
+        total = returnTranValue(sum(values))
+        self.tblTotal.cellWidget(0, ldtTime.col-8).setText(str(total))
+
+    def keyPressEvent(self, e):
+        def btnCloseClick():
+            self.windows.USER_TIME_DIG = False
+            self.close()
+        if e.key() == Qt.Key_Escape:
+            btnCloseClick()

@@ -8,12 +8,12 @@ import setting
 class Loading(QSplashScreen):
     def __init__(self):
         QSplashScreen.__init__(self)
-        self.setStyleSheet(style.SplashScreenLoading)
         self.setPixmap(QPixmap(setting.imgLogo).scaledToWidth(500))
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.mousePressEvent = self.MousePressEvent
         self.keyPressEvent = self.KeyPressEvent
+        self.show()
 
     def MousePressEvent(self, e):
         pass

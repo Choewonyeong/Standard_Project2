@@ -1,14 +1,16 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from connector.connDB import connDB
-from material import LdtTableTime
+from material.LineEdit import LdtTimeUserInTable
 
 
 class TableTimeUser(QTableWidget):
-    def __init__(self, account, year):
+    def __init__(self, account, year, widget):
         QTableWidget.__init__(self)
         self.account = account
         self.year = year
+        self.widget = widget
         self.__connector__()
         self.__variables__()
         self.__setting__()
@@ -35,10 +37,16 @@ class TableTimeUser(QTableWidget):
             self.insertRow(row)
             for col, data in enumerate(lst):
                 item = QTableWidgetItem(str(data))
-                item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row, col, item)
-                obj = LdtTableTime(row, col, str(data), self)
+                obj = LdtTimeUserInTable(row, col, str(data), self)
                 self.objects.append(obj)
                 if col in [0, 1, 2, 3, 4, 5, 6, 7]:
                     self.hideColumn(col)
         self.resizeColumnsToContents()
+
+    def refresh(self):
+        self.clear()
+        self.__connector__()
+        self.__variables__()
+        self.__setting__()
+        self.__setData__()

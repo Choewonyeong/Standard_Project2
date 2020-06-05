@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 from connector.connUser import connUser
-from material import FilterComboBox
+from material.ComboBox import CbxFilterInTable
+from design.style import Table
 
 
 class TableInquiryUser(QTableWidget):
     def __init__(self):
         QTableWidget.__init__(self)
+        self.setStyleSheet(Table.styleDefault)
         self.__connUser__()
         self.__variables__()
         self.__setting__()
@@ -31,16 +33,16 @@ class TableInquiryUser(QTableWidget):
 
     def __setFilter__(self):
         self.insertRow(0)
-        self.setRowHeight(0, 20)
         for idx, header in enumerate(self.columns):
-            items = ['필터'] + self.dataFrame[header].drop_duplicates().tolist()
-            FilterComboBox(idx, items, self)
+            items = ['전체'] + self.dataFrame[header].drop_duplicates().tolist()
+            CbxFilterInTable(idx, items, self)
 
     def __setData__(self):
         for row, lst in enumerate(self.dataFrame.values):
             self.insertRow(row+1)
+            self.setRowHeight(row+1, 50)
             for col, data in enumerate(lst):
-                item = QTableWidgetItem(data)
+                item = QTableWidgetItem(str(data))
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row+1, col, item)
         self.resizeColumnsToContents()
@@ -52,8 +54,7 @@ class TableInquiryUser(QTableWidget):
     def Filter(self, col, filterText):
         self.Show()
         for row in range(1, self.rowCount()):
-            if self.cellWidget(0, col).currentText() == '필터':
+            if self.cellWidget(0, col).currentText() == '전체':
                 self.Show()
             elif self.item(row, col).text() != filterText:
                 self.hideRow(row)
-

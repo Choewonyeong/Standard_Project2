@@ -179,21 +179,11 @@ class connDB:
             sumQuery = f"SUM(`{'`), SUM(`'.join(columns)}`)"
             query = f"select {sumQuery} from Main Where `계정`='{account}' and `적용상태_사업`='적용' and `적용상태_부서원`='적용';"
             run = conn.execute(query)
-            total = list(run.fetchall()[0])
+            total = [float(value) for value in run.fetchall()[0]]
             conn.close()
-
-            for idx, value in enumerate(total):
-                split = str(value).split('.')
-                intValue = int(split[1])
-                if value == 0.0:
-                    total[idx] = ''
-                elif not intValue:
-                    total[idx] = str(int(value))
-                else:
-                    total[idx] = str(value)
             return total
         except Exception as e:
-            print('test', e)
+            print('listTotal', e)
             return []
 
     def updateUserTime(self, column, value, number, option, account):

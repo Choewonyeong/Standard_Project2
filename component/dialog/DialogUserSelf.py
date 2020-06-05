@@ -1,7 +1,16 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtCore import Qt
 from connector.connUser import connUser
 from component.dialog.DialogMassage import DialogMassage
+from design.style.Dialog import styleGeneral
+from material.ComboBox import CbxUserSelf
+from material.PushButton import BtnUserSelfSave
+from material.PushButton import BtnUserSelfClose
+from material.Label import LblUserSelf
+from material.LineEdit import LdtUserSelf
+from setting.variables import itemUserDegree
 
 
 class DialogUserSelf(QDialog):
@@ -12,10 +21,12 @@ class DialogUserSelf(QDialog):
         self.__connector__()
         self.__variables__()
         self.__component__()
+        self.exec_()
 
     def __setting__(self):
-        # self.setStyleSheet()
+        self.setStyleSheet(styleGeneral)
         self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setFixedWidth(360)
 
     def __connector__(self):
         self.connUser = connUser()
@@ -33,20 +44,19 @@ class DialogUserSelf(QDialog):
         self.objectLabel = []
         self.objectInput = []
         for cnt, (text, info) in enumerate(zip(self.textLbl, self.userInfo)):
-            lbl = QLabel(text)
-            lbl.setFixedWidth(130)
+            lbl = LblUserSelf(text)
             self.objectLabel.append(lbl)
-            if cnt == 5:
-                ldt = QComboBox()
-                ldt.addItems(['박사', '석사', '학사', '전문대졸', '고졸'])
-                ldt.setCurrentText(info)
+            if cnt in [0, 11]:
+                widget = LdtUserSelf(lock=True, text=info)
+                widget.setEnabled(False)
+            elif cnt == 2:
+                widget = LdtUserSelf(text=info)
+                widget.setEchoMode(LdtUserSelf.Password)
+            elif cnt == 5:
+                widget = CbxUserSelf(itemUserDegree, text=info)
             else:
-                ldt = QLineEdit(info)
-                ldt.setFixedWidth(160)
-            self.objectInput.append(ldt)
-        self.objectInput[0].setEnabled(False)
-        self.objectInput[-1].setEnabled(False)
-        self.objectInput[2].setEchoMode(QLineEdit.Password)
+                widget = LdtUserSelf(text=info)
+            self.objectInput.append(widget)
 
     def __pushButton__(self):
         def btnCloseClick():
@@ -63,12 +73,9 @@ class DialogUserSelf(QDialog):
             editDate = self.connUser.returnEditDate(userInfo[0])
             self.objectInput[-1].setText(editDate)
             DialogMassage('저장되었습니다.')
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.setFixedWidth(80)
-        self.btnClose.clicked.connect(btnCloseClick)
-        self.btnApply = QPushButton('저장')
-        self.btnApply.setFixedWidth(80)
-        self.btnApply.clicked.connect(btnApplyClick)
+            self.close()
+        self.btnClose = BtnUserSelfClose('닫기(Esc)', btnCloseClick)
+        self.btnApply = BtnUserSelfSave('저장(Enter)', btnApplyClick)
 
     def __layout__(self):
         layoutObject = QVBoxLayout()

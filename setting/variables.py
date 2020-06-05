@@ -6,11 +6,11 @@ itemUserPosition = ['이사',
                     '사원',
                     '신입']
 
-itemUserDegree = ['고졸',
-                  '전문대졸',
-                  '학사',
+itemUserDegree = ['박사',
                   '석사',
-                  '박사']
+                  '학사',
+                  '전문대졸',
+                  '고졸']
 
 itemUserStatus = ['재직',
                   '파견'

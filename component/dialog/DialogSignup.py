@@ -1,13 +1,25 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QFormLayout
+from PyQt5.QtWidgets import QRadioButton
 from PyQt5.QtCore import Qt
+from design.style.Dialog import styleGeneral
+from material.GroupBox import GbxSignup
+from material.PushButton import BtnSubmit
+from material.PushButton import BtnCancel
 from setting import variables
 from connector.connUser import connUser
 from component.dialog.DialogMassage import DialogMassage
+from material.Label import LblSignup
+from material.LineEdit import LdtSignup
+from material.ComboBox import CbxSignup
 
 
 class Signup(QDialog):
     def __init__(self):
         QDialog.__init__(self)
+        self.setStyleSheet(styleGeneral)
         self.__setting__()
         self.__connector__()
         self.__variables__()
@@ -15,7 +27,7 @@ class Signup(QDialog):
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setFixedWidth(250)
+        self.setFixedWidth(340)
 
     def __connector__(self):
         self.connUser = connUser()
@@ -32,42 +44,37 @@ class Signup(QDialog):
         self.__layout__()
 
     def __label__(self):
-        self.lblAccount = QLabel('계정')
-        self.lblName = QLabel('성명')
-        self.lblPassword = QLabel('비밀번호   ')
-        self.lblPasswordConfirm = QLabel('비밀번호 확인')
-        self.lblIdentity = QLabel('주민등록번호')
-        self.lblPhone = QLabel('연락처')
-        self.lblDegree = QLabel('학력')
-        self.lblSchool = QLabel('학교')
-        self.lblMajor = QLabel('전공')
-        self.lblCar = QLabel('차량소지여부')
-        self.lblCarType = QLabel('차종')
-        self.lblCarNumber = QLabel('차량번호')
+        self.lblAccount = LblSignup('계정')
+        self.lblName = LblSignup('성명')
+        self.lblPassword = LblSignup('비밀번호   ')
+        self.lblPasswordConfirm = LblSignup('비밀번호 확인')
+        self.lblIdentity = LblSignup('주민등록번호')
+        self.lblPhone = LblSignup('연락처')
+        self.lblDegree = LblSignup('학력')
+        self.lblSchool = LblSignup('학교')
+        self.lblMajor = LblSignup('전공')
+        self.lblCar = LblSignup('차량소지여부')
+        self.lblCarType = LblSignup('차종')
+        self.lblCarNumber = LblSignup('차량번호')
 
     def __lineEdit__(self):
-        self.ldtAccount = QLineEdit()
-        self.ldtName = QLineEdit()
-        self.ldtPassword = QLineEdit()
-        self.ldtPassword.setEchoMode(QLineEdit.Password)
-        self.ldtPasswordConfirm = QLineEdit()
-        self.ldtPasswordConfirm.setEchoMode(QLineEdit.Password)
-        self.ldtIdentity = QLineEdit()
-        self.ldtIdentity.setPlaceholderText('ex) 950302-1')
+        self.ldtAccount = LdtSignup(essential=True)
+        self.ldtName = LdtSignup(essential=True)
+        self.ldtPassword = LdtSignup(essential=True)
+        self.ldtPassword.setEchoMode(LdtSignup.Password)
+        self.ldtPasswordConfirm = LdtSignup(essential=True)
+        self.ldtPasswordConfirm.setEchoMode(LdtSignup.Password)
+        self.ldtIdentity = LdtSignup(essential=True, holderText='ex) 950302-1')
         self.ldtIdentity.setMaxLength(8)
-        self.ldtPhone = QLineEdit()
-        self.ldtPhone.setPlaceholderText('ex) 010-3351-6137')
+        self.ldtPhone = LdtSignup(essential=True, holderText='ex) 010-3351-6137')
         self.ldtPhone.setMaxLength(13)
-        self.ldtSchool = QLineEdit()
-        self.ldtCarType = QLineEdit()
-        self.ldtCarNumber = QLineEdit()
-        self.ldtMajor = QLineEdit()
+        self.ldtSchool = LdtSignup()
+        self.ldtCarType = LdtSignup()
+        self.ldtCarNumber = LdtSignup()
+        self.ldtMajor = LdtSignup()
 
     def __comboBox__(self):
-        self.cbxDegree = QComboBox()
-        self.cbxDegree.addItems(variables.itemUserDegree)
-        self.cbxDegree.setCurrentText(variables.setUserDegree)
-        self.cbxDegree.setCursor(Qt.PointingHandCursor)
+        self.cbxDegree = CbxSignup(variables.itemUserDegree, variables.setUserDegree)
 
     def __radioButton__(self):
         def rbtCarTrueClick():
@@ -91,18 +98,18 @@ class Signup(QDialog):
         self.rbtCarFalse.setChecked(True)
         self.lblCarType.setVisible(False)
         self.lblCarNumber.setVisible(False)
+        self.ldtCarType.setVisible(False)
+        self.ldtCarNumber.setVisible(False)
         layoutRbt = QHBoxLayout()
         layoutRbt.addWidget(self.rbtCarTrue)
         layoutRbt.addWidget(self.rbtCarFalse)
-        self.gbxRadioButton = QGroupBox()
+        self.gbxRadioButton = GbxSignup()
         self.gbxRadioButton.setLayout(layoutRbt)
 
     def __pushButton__(self):
         def btnCloseClick():
             self.close()
-        self.btnClose = QPushButton('닫기')
-        self.btnClose.setCursor(Qt.PointingHandCursor)
-        self.btnClose.clicked.connect(btnCloseClick)
+        self.btnClose = BtnCancel('닫기', btnCloseClick)
 
         def btnSignupClick():
             userInfo = [self.ldtAccount.text(),
@@ -133,13 +140,10 @@ class Signup(QDialog):
                 DialogMassage('연락처를 입력하세요.')
             else:
                 self.connUser.insertNewUser(userInfo)
-                admins = self.connUser.returnAdmins()
-                DialogMassage(f"회원가입 신청이 완료되었습니다.\n관리자에게 승인을 요청하세요.\n관리자 : {', '.join(admins)}")
+                admins = self.connUser.returnAdmins().pop(0)
+                DialogMassage(f"회원가입 신청이 완료되었습니다.\n관리자에게 승인을 요청하세요.\n\n○ 관리자 : {', '.join(admins)}")
                 self.close()
-        self.btnSignup = QPushButton('신청')
-        self.btnSignup.setDefault(True)
-        self.btnSignup.setCursor(Qt.PointingHandCursor)
-        self.btnSignup.clicked.connect(btnSignupClick)
+        self.btnSignup = BtnSubmit('신청', btnSignupClick, default=True)
 
     def __layout__(self):
         widgets = [self.ldtAccount,

@@ -1,11 +1,9 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
-from material import FilterComboBox
 from connector.connUser import connUser
-from material import TableLineEdit
-from material import TableComboBox
-from material import BtnTableUserDelete
-from material import BtnTableUserPassword
+from material.ComboBox import CbxFilterInTable, CbxToolInTable
+from material.LineEdit import LdtAdminUserInTable
+from material.PushButton import BtnPasswordInTable, BtnDeleteInTable
 
 
 class TableAdminUser(QTableWidget):
@@ -39,47 +37,48 @@ class TableAdminUser(QTableWidget):
 
     def __setFilter__(self):
         self.insertRow(0)
-        self.setRowHeight(0, 20)
         for idx, header in enumerate(self.columns):
             if header in ['수정한날짜', '비밀번호', '설정']:
                 item = QTableWidgetItem('')
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(0, idx, item)
             else:
-                items = ['필터'] + self.dataFrame[header].drop_duplicates().tolist()
-                FilterComboBox(idx, items, self)
+                items = ['전체'] + self.dataFrame[header].drop_duplicates().tolist()
+                CbxFilterInTable(idx, items, self)
 
     def __setData__(self):
         for row, lst in enumerate(self.dataFrame.values):
             self.insertRow(row+1)
+            self.setRowHeight(row+1, 50)
             for col, data in enumerate(lst):
                 item = QTableWidgetItem(data)
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row+1, col, item)
-                if col in [1, 6, 7, 8, 9, 10]:
-                    TableLineEdit(row+1, col, data, self)
+                if col in [1, 3, 4, 6, 7, 8, 9, 10]:
+                    widget = LdtAdminUserInTable(row+1, col, data, self)
+                    self.objects.append(widget)
                 elif col == 2:
-                    TableComboBox(row+1, col, ['', '이사', '부장', '차장', '과장', '대리', '사원'], data, self)
-                elif col == 3:
-                    TableLineEdit(row+1, col, data, self, option="identity")
-                elif col == 4:
-                    TableLineEdit(row+1, col, data, self, option="phone")
+                    widget = CbxToolInTable(row+1, col, ['', '이사', '부장', '차장', '과장', '대리', '사원'], data, self)
+                    self.objects.append(widget)
                 elif col == 5:
-                    TableComboBox(row+1, col, ['', '박사', '석사', '학사', '전문대졸', '고졸'], data, self)
+                    widget = CbxToolInTable(row+1, col, ['', '박사', '석사', '학사', '전문대졸', '고졸'], data, self)
+                    self.objects.append(widget)
                 elif col == 11:
-                    TableComboBox(row+1, col, ['', '재직', '휴직', '파견', '정직', '퇴직'], data, self)
+                    widget = CbxToolInTable(row+1, col, ['', '재직', '휴직', '파견', '정직', '퇴직'], data, self)
+                    self.objects.append(widget)
                 elif col == 12:
-                    TableComboBox(row+1, col, ['사용자', '관리자'], data, self)
+                    widget = CbxToolInTable(row+1, col, ['사용자', '관리자'], data, self)
+                    self.objects.append(widget)
             col = len(self.columns)-2
-            BtnTableUserPassword(row+1, col, '확인', self)
+            BtnPasswordInTable('확인', self, row+1, col)
             col = col+1
-            BtnTableUserDelete(row+1, col, '삭제', self)
+            BtnDeleteInTable('삭제', self, row+1, col)
         self.resizeColumnsToContents()
-        self.setColumnWidth(1, 60)
+        self.setColumnWidth(1, 80)
         self.setColumnWidth(3, 80)
-        self.setColumnWidth(4, 100)
+        self.setColumnWidth(4, 120)
         self.setColumnWidth(5, 80)
-        self.setColumnWidth(6, 120)
+        self.setColumnWidth(6, 140)
         self.setColumnWidth(7, 120)
         self.setColumnWidth(8, 80)
         self.setColumnWidth(9, 80)

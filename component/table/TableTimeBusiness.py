@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from connector.connDB import connDB
-from material import LdtTableTimeBusiness
+from material.LineEdit import LdtTimeBusinessInTable
 
 
 class TableTimeBusiness(QTableWidget):
@@ -37,7 +38,7 @@ class TableTimeBusiness(QTableWidget):
                 item = QTableWidgetItem(str(data))
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row, col, item)
-                LdtTableTimeBusiness(row, col, str(data), self)
+                LdtTimeBusinessInTable(row, col, data, self)
                 if col == 0:
                     self.hideColumn(col)
         self.resizeColumnsToContents()
@@ -47,3 +48,11 @@ class TableTimeBusiness(QTableWidget):
         for col in range(1, self.columnCount()):
             self.width += self.columnWidth(col)
         self.setFixedWidth(self.width)
+
+    def refresh(self):
+        self.clear()
+        self.__connector__()
+        self.__variables__()
+        self.__setting__()
+        self.__setData__()
+        self.__setWidth__()

@@ -1,10 +1,15 @@
-from PyQt5.QtWidgets import *
-
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from connector.connBusiness import connBusiness
 from material.GeneralLabel import GeneralLabel
 from component.dialog.DialogNewBusiness import DialogNewBusiness
 from component.table.TableAdminBusiness import TableAdminBusiness
 from component.dialog.DialogMassage import DialogMassage
+from material.Label import LblNull
+from material.PushButton import BtnTool
+from material.PushButton import BtnTabClose
 
 
 class MainAdminBusiness(QWidget):
@@ -28,15 +33,19 @@ class MainAdminBusiness(QWidget):
         self.__layout__()
 
     def __pushButton__(self):
+        def btnCloseClick():
+            idx = self.windows.tab.currentIndex()
+            self.windows.tab.removeTab(idx)
+            self.windows.currentTabs.pop(idx)
+        self.btnClose = BtnTabClose('닫기(Esc)', btnCloseClick)
+
         def btnInsertClick():
             try:
                 dig = DialogNewBusiness(self)
                 dig.exec_()
             except Exception as e:
                 print(e)
-        self.btnInput = QPushButton('신규 입력')
-        self.btnInput.clicked.connect(btnInsertClick)
-        self.btnInput.setFixedWidth(80)
+        self.btnInput = BtnTool('신규 입력', btnInsertClick, shortcut='Ctrl+N')
 
         def btnSaveClick():
             for obj in self.tbl.objects:
@@ -48,21 +57,22 @@ class MainAdminBusiness(QWidget):
                     cnt += 1
                 if cnt:
                     DialogMassage('저장되었습니다.')
-        self.btnSave = QPushButton('저장')
-        self.btnSave.clicked.connect(btnSaveClick)
-        self.btnSave.setFixedWidth(80)
+        self.btnSave = BtnTool('저장', btnSaveClick, shortcut='Ctrl+S')
 
-        # 엑셀로 저장 후 종료됨 -> 왜?
+        def btnRefreshClick():
+            # windows에서 한꺼번에 구현할 것
+            pass
+        self.btnRefresh = BtnTool('새로고침(F5)', btnRefreshClick, shortcut='F5')
+
         def btnExcelClick():
             dig = QFileDialog(self)
-            filePath = dig.getSaveFileName(caption="엑셀로 저장", directory='', filter='*.xlsx')[0]
+            filePath = dig.getSaveFileName(caption="엑셀로 내보내기", directory='', filter='*.xlsx')[0]
             if filePath != '':
                 dataFrame = self.tbl.dataFrame
                 dataFrame.to_excel(filePath, sheet_name="화재안전팀 사업 현황", index=False)
                 DialogMassage('엑셀로 내보내기가 완료되었습니다.')
-        self.btnExcel = QPushButton('엑셀로 저장')
+        self.btnExcel = BtnTool('엑셀로 저장', btnExcelClick, shortcut='Ctrl+E')
         self.btnExcel.clicked.connect(btnExcelClick)
-        self.btnExcel.setFixedWidth(80)
 
     def __table__(self):
         self.tbl = TableAdminBusiness(self)
@@ -74,10 +84,12 @@ class MainAdminBusiness(QWidget):
 
     def __layout__(self):
         layoutBtn = QHBoxLayout()
+        layoutBtn.addWidget(self.btnClose)
         layoutBtn.addWidget(self.btnInput)
         layoutBtn.addWidget(self.btnSave)
+        layoutBtn.addWidget(self.btnRefresh)
         layoutBtn.addWidget(self.btnExcel)
-        layoutBtn.addWidget(QLabel(), 10)
+        layoutBtn.addWidget(LblNull(), 10)
         layout = QVBoxLayout()
         layout.addLayout(layoutBtn)
         layout.addWidget(self.lblCount)

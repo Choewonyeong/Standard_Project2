@@ -1,18 +1,13 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
-
-default = """
-QTableView{
-    color: black;
-    font-weight: bold;
-}
-"""
+from design.style import Table
 
 
 class TableTimeHeader(QTableWidget):
     def __init__(self):
         QTableWidget.__init__(self)
-        self.setStyleSheet(default)
+        self.setStyleSheet(Table.styleTitle)
         self.__setting__()
         self.__setData__()
 

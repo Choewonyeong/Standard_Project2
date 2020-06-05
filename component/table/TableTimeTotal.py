@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from connector.connDB import connDB
-from material import LdtTableTotal
+from material.LineEdit import LdtTimeDayTotalInTable
 
 
 class TableTimeTotal(QTableWidget):
@@ -23,8 +24,8 @@ class TableTimeTotal(QTableWidget):
 
     def __setting__(self):
         self.setRowCount(0)
-        self.setColumnCount(len(self.lst))
-        self.setHorizontalHeaderLabels(self.lst)
+        self.setColumnCount(len(self.columns))
+        self.setHorizontalHeaderLabels(self.columns)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setVisible(False)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -33,8 +34,17 @@ class TableTimeTotal(QTableWidget):
     def __setData__(self):
         self.insertRow(0)
         for col, data in enumerate(self.lst):
-            item = QTableWidgetItem(str(data))
+            split = str(data).split('.')
+            intValue = int(split[1])
+            if data == 0.0:
+                data = ''
+            elif intValue == 0:
+                data = str(int(data))
+            else:
+                data = str(data)
+            item = QTableWidgetItem(data)
             item.setFlags(Qt.ItemIsEditable)
             self.setItem(0, col, item)
-            LdtTableTotal(0, col, str(data), self)
+            LdtTimeDayTotalInTable(0, col, str(data), self)
         self.resizeColumnsToContents()
+

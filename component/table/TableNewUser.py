@@ -1,16 +1,18 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QTableWidget
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from component.dialog.DialogMassage import DialogMassage
 from connector.connDB import connDB
 from connector.connUser import connUser
+from material.PushButton import BtnAcceptInTable, BtnRejectInTable
 
 
 class TableNewUser(QTableWidget):
-    def __init__(self, widget, columns, dataFrame):
+    def __init__(self, widget):
         QTableWidget.__init__(self)
         self.widget = widget
-        self.columns = columns
-        self.dataFrame = dataFrame
+        self.columns = widget.columns
+        self.dataFrame = widget.dataFrame
         self.__setting__()
         self.__connector__()
         self.__setData__()
@@ -25,33 +27,27 @@ class TableNewUser(QTableWidget):
         self.connUser = connUser()
         self.connDB = connDB(self.widget.windows.CURRENT_YEAR)
 
-    def __btnAccept__(self, row):
+    def __setData__(self):
         def btnAcceptClick():
             r = self.currentRow()
             account = self.item(r, 0).text()
             self.connUser.acceptNewUser(account)
             self.connDB.insertNewUser(account)
             self.removeRow(r)
-        btnAccept = QPushButton('승인')
-        btnAccept.setFixedWidth(80)
-        btnAccept.clicked.connect(btnAcceptClick)
-        self.setCellWidget(row, 3, btnAccept)
 
-    def __btnReject__(self, row):
         def btnRejectClick():
             r = self.currentRow()
+            c = self.columns.index('가입승인여부')
             account = self.item(r, 0).text()
             self.connUser.rejectNewUser(account)
-            msgBox = DialogMassage('계정 정보를 지우시겠습니까?', True)
+            i = QTableWidgetItem('거절')
+            i.setFlags(Qt.ItemIsEditable)
+            self.setItem(r, c, i)
+            msgBox = DialogMassage('계정 정보를 삭제하시겠습니까?', True)
             if msgBox.value:
                 self.connUser.deleteUser(account)
                 self.removeRow(r)
-        btnReject = QPushButton('거절')
-        btnReject.setFixedWidth(80)
-        btnReject.clicked.connect(btnRejectClick)
-        self.setCellWidget(row, 4, btnReject)
 
-    def __setData__(self):
         for row, lst in enumerate(self.dataFrame.values):
             self.insertRow(row)
             self.setRowHeight(50, row)
@@ -59,6 +55,7 @@ class TableNewUser(QTableWidget):
                 item = QTableWidgetItem(data)
                 item.setFlags(Qt.ItemIsEditable)
                 self.setItem(row, col, item)
-            self.__btnAccept__(row)
-            self.__btnReject__(row)
+            col = self.columnCount()
+            BtnAcceptInTable('승인', btnAcceptClick, self, row, col-2)
+            BtnRejectInTable('거절', btnRejectClick, self, row, col-1)
         self.resizeColumnsToContents()

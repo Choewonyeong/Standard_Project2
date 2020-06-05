@@ -1,12 +1,21 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtCore import Qt
 from connector.connUser import connUser
 from component.dialog.DialogMassage import DialogMassage
+from design.style.Dialog import styleGeneral
+from material.Label import LblSignup
+from material.Label import LblInformation
+from material.LineEdit import LdtEditPasswordRight
+from material.PushButton import BtnNo
+from material.PushButton import BtnYes
 
 
 class DialogPassword(QDialog):
     def __init__(self, name, account, password, row, table):
         QDialog.__init__(self)
+        self.setStyleSheet(styleGeneral)
         self.row = row
         self.table = table
         self.name = name
@@ -19,6 +28,7 @@ class DialogPassword(QDialog):
 
     def __setting__(self):
         self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setFixedWidth(350)
 
     def __connector__(self):
         self.connUser = connUser()
@@ -30,22 +40,20 @@ class DialogPassword(QDialog):
         self.__layout__()
 
     def __label__(self):
-        self.lblAccount = QLabel(f"ID : {self.account}")
-        self.lblName = QLabel(f"성명 : {self.name}")
-        self.lblPassword = QLabel(f"비밀번호 : {self.password}")
-        self.lblChange = QLabel('새 비밀번호')
-        self.lblChangeConfirm = QLabel('새 비밀번호 확인')
+        self.lblAccount = LblInformation(f"ID : {self.account}")
+        self.lblName = LblInformation(f"성명 : {self.name}")
+        self.lblPassword = LblInformation(f"비밀번호 : {self.password}")
+        self.lblChange = LblSignup('새 비밀번호')
+        self.lblChangeConfirm = LblSignup('새 비밀번호 확인')
 
     def __lineEdit__(self):
-        self.ldtChange = QLineEdit()
-        self.ldtChange.setEchoMode(QLineEdit.Password)
-        self.ldtChangeConfirm = QLineEdit()
-        self.ldtChangeConfirm.setEchoMode(QLineEdit.Password)
+        self.ldtChange = LdtEditPasswordRight()
+        self.ldtChangeConfirm = LdtEditPasswordRight()
 
     def __pushButton__(self):
         def btnCloseClick():
             self.close()
-        self.btnClose = QPushButton('닫기')
+        self.btnClose = BtnNo('닫기', btnCloseClick)
         self.btnClose.clicked.connect(btnCloseClick)
 
         def btnApplyClick():
@@ -61,8 +69,7 @@ class DialogPassword(QDialog):
                 self.table.UpdateEditDate(self.row, self.connUser.updatePassword(self.account, newPassword))
                 DialogMassage(f'{self.name}님의 비밀번호가 변경되었습니다.')
                 self.close()
-        self.btnApply = QPushButton('변경')
-        self.btnApply.clicked.connect(btnApplyClick)
+        self.btnApply = BtnYes('변경', btnApplyClick, default=True, shortcut='return')
 
     def __layout__(self):
         layoutChange = QHBoxLayout()

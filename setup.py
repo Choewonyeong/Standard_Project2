@@ -1,14 +1,11 @@
-from PyQt5.QtWidgets import QApplication, QStyleFactory
+from PyQt5.QtWidgets import QApplication
 from component.main.Loading import Loading
 from sys import argv
 
 
 def run():
     app = QApplication(argv)
-    # app.setStyle(QStyleFactory.create('fusion'))
-    # print(QStyleFactory.keys())
     loading = Loading()
-    loading.show()
     from component.main.Login import Login
     login = Login(app)
     login.show()
